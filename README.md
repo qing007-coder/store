@@ -1,0 +1,1 @@
+A shopping mall system with a microservice-based backend architecture.
