@@ -6,7 +6,7 @@ import (
 
 type Consumer struct {
 	consumer      sarama.Consumer
-	handleMessage func(message *sarama.ConsumerMessage)
+	handleMessage func(*sarama.ConsumerMessage)
 	handleError   func(error)
 }
 
