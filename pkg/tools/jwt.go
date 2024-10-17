@@ -1,9 +1,9 @@
 package tools
 
 import (
-	"article/pkg/config"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"store/pkg/config"
 	"time"
 )
 

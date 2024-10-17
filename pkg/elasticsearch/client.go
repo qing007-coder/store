@@ -1,7 +1,6 @@
 package elasticsearch
 
 import (
-	"article/pkg/config"
 	"context"
 	"encoding/json"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -16,16 +15,16 @@ type Elasticsearch struct {
 	Index  string
 }
 
-func NewClient(ctx context.Context, conf *config.GlobalConfig, index string) (*Elasticsearch, error) {
+func NewClient(ctx context.Context, address string, index string) (*Elasticsearch, error) {
 	client := new(Elasticsearch)
-	err := client.init(ctx, conf, index)
+	err := client.init(ctx, address, index)
 	return client, err
 }
 
-func (es *Elasticsearch) init(ctx context.Context, config *config.GlobalConfig, index string) error {
+func (es *Elasticsearch) init(ctx context.Context, address string, index string) error {
 	conf := elasticsearch.Config{
 		Addresses: []string{
-			config.Elasticsearch.Address,
+			address,
 		},
 	}
 

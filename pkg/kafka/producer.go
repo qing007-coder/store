@@ -4,15 +4,25 @@ import (
 	"github.com/IBM/sarama"
 )
 
+type Setting struct {
+	Addr           []string
+	Conf           *sarama.Config
+	SuccessHandler func(*sarama.ProducerMessage)
+	ErrorHandler   func(error)
+	MessageHandler func(message *sarama.ConsumerMessage)
+}
+
 type Producer struct {
 	producer      sarama.AsyncProducer
 	handleSuccess func(*sarama.ProducerMessage)
 	handleError   func(error)
 }
 
-func NewProducer(addr []string, conf *sarama.Config) (*Producer, error) {
+func NewProducer(s *Setting) (*Producer, error) {
 	p := new(Producer)
-	if err := p.init(addr, conf); err != nil {
+	p.SetErrorHandler(s.ErrorHandler)
+	p.SetSuccessHandler(s.SuccessHandler)
+	if err := p.init(s.Addr, s.Conf); err != nil {
 		return nil, err
 	}
 

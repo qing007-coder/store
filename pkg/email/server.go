@@ -1,11 +1,11 @@
 package email
 
 import (
-	"article/pkg/config"
-	"article/pkg/errors"
-	"article/pkg/tools"
 	"fmt"
 	"gopkg.in/gomail.v2"
+	"store/pkg/config"
+	"store/pkg/errors"
+	"store/pkg/tools"
 )
 
 type Server struct {

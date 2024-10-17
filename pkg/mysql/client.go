@@ -1,12 +1,12 @@
 package mysql
 
 import (
-	"article/pkg/config"
-	"article/pkg/errors"
-	"article/pkg/model"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"store/pkg/config"
+	"store/pkg/errors"
+	"store/pkg/model"
 )
 
 func NewClient(conf *config.GlobalConfig) (*gorm.DB, error) {

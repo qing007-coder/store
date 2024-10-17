@@ -1,10 +1,10 @@
 package redis
 
 import (
-	"article/pkg/config"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"store/pkg/config"
 	"time"
 )
 

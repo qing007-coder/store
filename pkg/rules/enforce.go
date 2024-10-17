@@ -1,9 +1,9 @@
 package rules
 
 import (
-	"article/pkg/model"
-	"article/pkg/tools"
 	"gorm.io/gorm"
+	"store/pkg/model"
+	"store/pkg/tools"
 )
 
 type Enforcer struct {

@@ -1,9 +1,9 @@
 package config
 
 import (
-	"article/pkg/errors"
 	"fmt"
 	"github.com/spf13/viper"
+	"store/pkg/errors"
 )
 
 type GlobalConfig struct {

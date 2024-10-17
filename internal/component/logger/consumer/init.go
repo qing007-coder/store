@@ -1,7 +1,8 @@
-package logger
+package consumer
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/IBM/sarama"
 	"log"
 	"store/pkg/constant"
@@ -27,17 +28,19 @@ func NewLogConsumer(es *elasticsearch.Elasticsearch, c *kafka.Consumer) *LogCons
 }
 
 func (l *LogConsumer) Run() error {
-	return l.consumer.Subscribe(constant.LOGTOPIC, 0, sarama.OffsetOldest)
+	return l.consumer.Subscribe(constant.LOGTOPIC, 0, sarama.OffsetNewest)
 }
 
 func (l *LogConsumer) HandleLog(message *sarama.ConsumerMessage) {
 	var lg model.Log
+	//fmt.Println(string(message.Value))
 	if err := json.Unmarshal(message.Value, &lg); err != nil {
-		log.Println("err:", err)
+		fmt.Println("err:", err)
 		return
 	}
+	fmt.Println(lg)
 	if err := l.es.CreateDocument(&lg, lg.ID); err != nil {
-		log.Println("err:", err)
+		fmt.Println("err:", err)
 		return
 	}
 }

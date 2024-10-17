@@ -10,10 +10,12 @@ type Consumer struct {
 	handleError   func(error)
 }
 
-func NewConsumer(addr []string, conf *sarama.Config) (*Consumer, error) {
-	c := &Consumer{}
+func NewConsumer(s *Setting) (*Consumer, error) {
+	c := new(Consumer)
 
-	if err := c.init(addr, conf); err != nil {
+	c.SetMessageHandler(s.MessageHandler)
+	c.SetErrorHandler(s.ErrorHandler)
+	if err := c.init(s.Addr, s.Conf); err != nil {
 		return nil, err
 	}
 
@@ -30,7 +32,7 @@ func (c *Consumer) init(addr []string, conf *sarama.Config) error {
 	return nil
 }
 
-func (c *Consumer) SetMessageHandler(f func(message *sarama.ConsumerMessage)) {
+func (c *Consumer) SetMessageHandler(f func(*sarama.ConsumerMessage)) {
 	c.handleMessage = f
 }
 
@@ -40,7 +42,7 @@ func (c *Consumer) SetErrorHandler(f func(error)) {
 
 func (c *Consumer) Subscribe(topic string, partition int32, offset int64) error {
 	worker, err := c.consumer.ConsumePartition(topic, partition, offset)
-	defer worker.Close()
+	//defer worker.Close()
 	if err != nil {
 		return err
 	}

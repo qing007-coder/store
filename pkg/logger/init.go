@@ -6,6 +6,8 @@ import (
 	"go.uber.org/zap/zapcore"
 	"store/pkg/constant"
 	"store/pkg/kafka"
+	"store/pkg/tools"
+	"time"
 )
 
 type Logger struct {
@@ -42,10 +44,18 @@ func (l *Logger) Write(data []byte) (n int, err error) {
 	return len(data), nil
 }
 
-func (l *Logger) Info(msg string, fields ...zap.Field) {
-	l.logger.Info(msg, fields...)
+func (l *Logger) Info(message, source string) {
+	l.logger.Info(message,
+		zap.Int64("time", time.Now().Unix()),
+		zap.String("source", source),
+		zap.String("id", tools.CreateID()),
+	)
 }
 
-func (l *Logger) Error(msg string, fields ...zap.Field) {
-	l.logger.Error(msg, fields...)
+func (l *Logger) Error(message, source string) {
+	l.logger.Error(message,
+		zap.Time("time", time.Now()),
+		zap.String("source", source),
+		zap.String("id", tools.CreateID()),
+	)
 }
