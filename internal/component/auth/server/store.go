@@ -5,6 +5,7 @@ import (
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/models"
 	"gorm.io/gorm"
+	"store/pkg/model"
 )
 
 type Store struct {
@@ -18,12 +19,16 @@ func NewStore(db *gorm.DB) *Store {
 }
 
 // GetByID 实现oauth2.0的接口
-func (c *Store) GetByID(ctx context.Context, id string) (oauth2.ClientInfo, error) {
+func (s *Store) GetByID(ctx context.Context, id string) (oauth2.ClientInfo, error) {
+	var cli model.Client
+	if err := s.db.Where("id = ?", id).First(&cli).Error; err != nil {
+		return nil, err
+	}
 
 	return &models.Client{
-		ID:     client.ID,
-		UserID: client.UserID,
-		Secret: client.Secret,
-		Domain: client.Domain,
+		ID:     cli.ID,
+		UserID: cli.UserID,
+		Secret: cli.Secret,
+		Domain: cli.Domain,
 	}, nil
 }

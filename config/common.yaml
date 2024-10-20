@@ -1,0 +1,39 @@
+redis:
+  addr: "127.0.0.1"
+  port: "6379"
+  password: ""
+mysql:
+  addr: "127.0.0.1"
+  port: "3306"
+  password: "040824"
+  database: "chat"
+  name: "root"
+  conf: "charset=utf8&parseTime=true&loc=Local"
+consul:
+  addr: "121212"
+  port: "1212"
+  name: "sdfa"
+kafka:
+  addr: "127.0.0.1"
+  port: "9092"
+logger:
+  maxSize: 1
+  maxAge: 1
+  maxBackUps: 1
+secretKey: "qingqing"
+mongoDB:
+  address: "127.0.0.1"
+  port: "27017"
+  database: "chat"
+email:
+  account: "1457800511@qq.com"
+  password: "hchvyiowagokbabf"
+  host: "smtp.qq.com"
+minio:
+  endPoint: "127.0.0.1"
+  port: "9000"
+  accessKey: ""
+  secretKey: ""
+jwt:
+  secretKey: "qingqing"
+  expiry: 2

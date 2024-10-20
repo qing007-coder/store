@@ -2,7 +2,6 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-redis/redis/v8"
 	"store/pkg/config"
 	"time"
@@ -20,14 +19,23 @@ func NewClient(conf *config.GlobalConfig) *Client {
 }
 
 func (r *Client) init(conf *config.GlobalConfig) {
-	r.Client = redis.NewClient(r.GetConfig(conf))
+	//r.Client = redis.NewClient(r.GetConfig(conf))
+	r.Client = redis.NewClient(r.GetConfig())
 }
 
-func (r *Client) GetConfig(conf *config.GlobalConfig) *redis.Options {
+//func (r *Client) GetConfig(conf *config.GlobalConfig) *redis.Options {
+//	return &redis.Options{
+//		Addr:     fmt.Sprintf("%s:%s", conf.Redis.Address, conf.Redis.Port),
+//		Password: conf.Redis.Password,
+//		DB:       conf.Redis.DB,
+//	}
+//}
+
+func (r *Client) GetConfig() *redis.Options {
 	return &redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", conf.Redis.Address, conf.Redis.Port),
-		Password: conf.Redis.Password,
-		DB:       conf.Redis.DB,
+		Addr:     "127.0.0.1:3306",
+		Password: "",
+		DB:       0,
 	}
 }
 

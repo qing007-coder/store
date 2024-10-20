@@ -16,4 +16,9 @@ type UserRole struct {
 }
 
 type Client struct {
+	ID     string `gorm:"primaryKey"`
+	Secret string
+	Domain string
+	Scope  string
+	UserID string
 }

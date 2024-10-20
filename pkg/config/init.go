@@ -1,14 +1,13 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"store/pkg/errors"
 )
 
 type GlobalConfig struct {
 	Mysql struct {
-		Address  string `yaml:"address"`
+		Addr     string `yaml:"addr"`
 		Port     string `yaml:"port"`
 		Database string `yaml:"database"`
 		Name     string `yaml:"name"`
@@ -17,7 +16,7 @@ type GlobalConfig struct {
 	} `yaml:"mysql"`
 
 	Redis struct {
-		Address  string `yaml:"address"`
+		Addr     string `yaml:"addr"`
 		Port     string `yaml:"port"`
 		DB       int    `yaml:"db"`
 		Password string `yaml:"password"`
@@ -29,7 +28,8 @@ type GlobalConfig struct {
 	} `yaml:"jwt"`
 
 	Elasticsearch struct {
-		Address string `yaml:"address"`
+		Addr string `yaml:"addr"`
+		Port string `yaml:"port"`
 	} `yaml:"elasticsearch"`
 
 	SecretKey string `yaml:"secretKey"`
@@ -45,6 +45,24 @@ type GlobalConfig struct {
 		Host     string `yaml:"host"`
 		Port     int    `yaml:"port"`
 	} `yaml:"email"`
+
+	Consul struct {
+		Addr string `yaml:"addr"`
+		Port string `yaml:"port"`
+		Name string `yaml:"name"`
+	} `yaml:"consul"`
+
+	Minio struct {
+		Endpoint  string `yaml:"endpoint"`
+		Port      string `yaml:"port"`
+		AccessKey string `yaml:"accessKey"`
+		SecretKey string `yaml:"secretKey"`
+	} `yaml:"minio"`
+
+	Kafka struct {
+		Addr string `yaml:"addr"`
+		Port string `yaml:"port"`
+	} `yaml:"kafka"`
 }
 
 func NewGlobalConfig() (*GlobalConfig, error) {
@@ -64,7 +82,6 @@ func (c *GlobalConfig) init() error {
 	if err := v.ReadInConfig(); err != nil {
 		_, ok := err.(viper.ConfigFileNotFoundError)
 		if ok {
-			fmt.Println(1111)
 			return errors.ConfigFileNotFound
 		} else {
 			return errors.OtherError

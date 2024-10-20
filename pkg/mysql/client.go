@@ -29,8 +29,8 @@ func NewClient(conf *config.GlobalConfig) (*gorm.DB, error) {
 
 	if err := client.AutoMigrate(
 		&model.UserRole{},
-		&model.ArticleJudgeRecord{},
 		&model.User{},
+		&model.Client{},
 	); err != nil {
 		return nil, errors.AutoMigrateFailed
 	}
