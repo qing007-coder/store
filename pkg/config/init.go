@@ -34,9 +34,9 @@ type GlobalConfig struct {
 
 	SecretKey string `yaml:"secretKey"`
 	Logger    struct {
-		MaxSize    int `yaml:"max_size"`
-		MaxBackups int `yaml:"max_backups"`
-		MaxAge     int `yaml:"max_age"`
+		MaxSize    int `yaml:"maxSize"`
+		MaxBackups int `yaml:"maxBackups"`
+		MaxAge     int `yaml:"maxAge"`
 	} `yaml:"logger"`
 
 	Email struct {

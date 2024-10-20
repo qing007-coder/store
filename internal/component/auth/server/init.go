@@ -13,24 +13,28 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
-	"slices"
-	"store/pkg/model"
+	"store/pkg/config"
 	"store/pkg/redis"
-	"strings"
+	"store/pkg/rules"
 	"time"
 )
 
 type Server struct {
-	ctx context.Context
-	Srv *server.Server
-	rdb *redis.Client
-	db  *gorm.DB
+	ctx      context.Context
+	Srv      *server.Server
+	rdb      *redis.Client
+	db       *gorm.DB
+	conf     *config.GlobalConfig
+	enforcer *rules.Enforcer
 }
 
-func NewServer(r *redis.Client, db *gorm.DB) *Server {
+func NewServer(r *redis.Client, db *gorm.DB, conf *config.GlobalConfig, e *rules.Enforcer) *Server {
 	srv := &Server{
-		rdb: r,
-		db:  db,
+		ctx:      context.Background(),
+		rdb:      r,
+		db:       db,
+		conf:     conf,
+		enforcer: e,
 	}
 	srv.init()
 	return srv
@@ -41,11 +45,11 @@ func (s *Server) init() {
 	manager := manage.NewManager()
 	manager.SetAuthorizeCodeTokenCfg(&manage.Config{
 		AccessTokenExp:    time.Hour * 6,
-		RefreshTokenExp:   time.Hour * 24 * 3,
+		RefreshTokenExp:   time.Hour * 24 * 2,
 		IsGenerateRefresh: true,
 	}) // 设置token的配置
 
-	manager.MapTokenStorage(redis_.NewRedisStore(s.rdb.GetConfig())) // 设置存储token的配置
+	manager.MapTokenStorage(redis_.NewRedisStore(s.rdb.GetConfig(s.conf))) // 设置存储token的配置
 	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("qing", []byte("密钥miyao"), jwt.SigningMethodHS256))
 	manager.MapAuthorizeGenerate(generates.NewAuthorizeGenerate())
 
@@ -103,19 +107,11 @@ func (s *Server) UserAuthorizeHandler(w http.ResponseWriter, r *http.Request) (s
 
 // ClientScopeHandler 验证client的scope是否合规
 func (s *Server) ClientScopeHandler(tgr *oauth2.TokenGenerateRequest) (bool, error) {
-	var client model.Client
-	if err := s.db.Where("id = ?", tgr.ClientID).First(&client).Error; err != nil {
+	fmt.Println(tgr.Scope)
+	if err := s.enforcer.Enforce(tgr.ClientID, tgr.Scope, "access"); err != nil {
 		return false, err
 	}
-
-	scopes := strings.Split(client.Scope, " ")
-	ok := slices.Contains(scopes, tgr.Scope)
-	if ok {
-		return ok, nil
-	} else {
-		fmt.Println("未授权scope")
-		return !ok, errors.New("未授权scope")
-	}
+	return true, nil
 }
 
 func (s *Server) HandleAuthorizeRequest(w http.ResponseWriter, r *http.Request) error {

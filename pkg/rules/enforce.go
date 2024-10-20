@@ -17,7 +17,7 @@ func NewEnforcer(db *gorm.DB) *Enforcer {
 	}
 }
 
-func (e *Enforcer) AddGroup(uid, policy string) error {
+func (e *Enforcer) AddGroup(uid string, policy ...string) error {
 	// 判断有没有这个policy
 	var count int64
 	e.db.Model(&model.UserRole{}).Where("type = ? AND v1 = ?", POLICY, policy).Count(&count)
@@ -25,12 +25,14 @@ func (e *Enforcer) AddGroup(uid, policy string) error {
 		return NoMatchingPolicy
 	}
 
-	e.db.Create(&model.UserRole{
-		ID:   tools.CreateID(),
-		Type: GROUP,
-		V1:   uid,
-		V2:   policy,
-	})
+	for _, p := range policy {
+		e.db.Create(&model.UserRole{
+			ID:   tools.CreateID(),
+			Type: GROUP,
+			V1:   uid,
+			V2:   p,
+		})
+	}
 
 	return nil
 }
@@ -72,9 +74,11 @@ func (e *Enforcer) RemovePolicy(policy, source, action string) error {
 	return nil
 }
 
-func (e *Enforcer) RemoveGroup(uid, policy string) error {
-	if err := e.db.Where("type = ? AND v1 = ? AND v2 = ?", GROUP, uid, policy).Delete(&model.UserRole{}).Error; err != nil {
-		return err
+func (e *Enforcer) RemoveGroup(uid string, policy ...string) error {
+	for _, p := range policy {
+		if err := e.db.Where("type = ? AND v1 = ? AND v2 = ?", GROUP, uid, p).Delete(&model.UserRole{}).Error; err != nil {
+			return err
+		}
 	}
 
 	return nil
