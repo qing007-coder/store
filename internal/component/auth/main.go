@@ -7,6 +7,7 @@ import (
 	"store/pkg/mysql"
 	"store/pkg/redis"
 	"store/pkg/rules"
+	server_ "store/pkg/sso/server"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 		return
 	}
 	enforcer := rules.NewEnforcer(db)
-	srv := server.NewServer(rdb, db, conf, enforcer)
+	srv := server_.NewServer(rdb, db, conf, enforcer)
 	auth := server.NewAuthApi(srv, db, enforcer)
 	router := server.NewRouter(auth)
 	if err := router.Run(); err != nil {

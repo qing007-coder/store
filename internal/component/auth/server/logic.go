@@ -7,16 +7,17 @@ import (
 	"net/http"
 	"store/pkg/model"
 	"store/pkg/rules"
+	"store/pkg/sso/server"
 	"store/pkg/tools"
 )
 
 type AuthApi struct {
-	srv *Server
+	srv *server.Server
 	db  *gorm.DB
 	e   *rules.Enforcer
 }
 
-func NewAuthApi(srv *Server, db *gorm.DB, e *rules.Enforcer) *AuthApi {
+func NewAuthApi(srv *server.Server, db *gorm.DB, e *rules.Enforcer) *AuthApi {
 	return &AuthApi{
 		srv: srv,
 		db:  db,
