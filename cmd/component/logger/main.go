@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/IBM/sarama"
-	"store/internal/component/logger/consumer"
+	"store/internal/component/logger"
 	"store/pkg/elasticsearch"
 	"store/pkg/kafka"
 )
@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	worker := consumer.NewLogConsumer(es, c)
+	worker := logger.NewLogConsumer(es, c)
 	if err := worker.Run(); err != nil {
 		fmt.Println("err:", err)
 		return

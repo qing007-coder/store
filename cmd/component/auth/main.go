@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"store/internal/component/auth/server"
+	"store/internal/component/auth"
 	"store/pkg/config"
 	"store/pkg/mysql"
 	"store/pkg/redis"
 	"store/pkg/rules"
-	server_ "store/pkg/sso/server"
+	"store/pkg/sso/server"
 )
 
 func main() {
@@ -23,9 +23,9 @@ func main() {
 		return
 	}
 	enforcer := rules.NewEnforcer(db)
-	srv := server_.NewServer(rdb, db, conf, enforcer)
-	auth := server.NewAuthApi(srv, db, enforcer)
-	router := server.NewRouter(auth)
+	srv := server.NewServer(rdb, db, conf, enforcer)
+	authApi := auth.NewAuthApi(srv, db, enforcer)
+	router := auth.NewRouter(authApi)
 	if err := router.Run(); err != nil {
 		fmt.Println(err)
 	}
