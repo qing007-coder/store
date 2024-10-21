@@ -121,3 +121,7 @@ func (s *Server) HandleAuthorizeRequest(w http.ResponseWriter, r *http.Request) 
 func (s *Server) HandleTokenRequest(w http.ResponseWriter, r *http.Request) error {
 	return s.Srv.HandleTokenRequest(w, r)
 }
+
+func (s *Server) ValidationBearerToken(r *http.Request) (oauth2.TokenInfo, error) {
+	return s.Srv.ValidationBearerToken(r)
+}

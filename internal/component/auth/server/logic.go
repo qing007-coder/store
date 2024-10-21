@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"net/http"
 	"store/pkg/model"
 	"store/pkg/rules"
 	"store/pkg/tools"
@@ -39,6 +40,24 @@ func (a *AuthApi) ExchangeToken(ctx *gin.Context) {
 		return
 	}
 	fmt.Println("success")
+}
+
+func (a *AuthApi) ValidateToken(ctx *gin.Context) {
+	tokenInfo, err := a.srv.ValidationBearerToken(ctx.Request)
+	if err != nil {
+		ctx.JSON(http.StatusOK, model.ValidateTokenResp{
+			Code:    400,
+			Message: err.Error(),
+		})
+
+		return
+	}
+
+	uid := tokenInfo.GetUserID()
+	ctx.JSON(http.StatusOK, model.ValidateTokenResp{
+		Code:    200,
+		Message: uid,
+	})
 }
 
 func (a *AuthApi) RegisterClient(ctx *gin.Context) {

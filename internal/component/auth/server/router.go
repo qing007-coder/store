@@ -18,6 +18,7 @@ func (r *Router) Run() error {
 	r.engine.GET("auth", r.auth.Auth)
 	r.engine.GET("token", r.auth.ExchangeToken)
 	r.engine.POST("register", r.auth.RegisterClient)
+	r.engine.POST("validate_token", r.auth.ValidateToken)
 
 	return r.engine.Run(":8081")
 }
