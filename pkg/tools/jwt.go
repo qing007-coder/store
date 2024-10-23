@@ -3,12 +3,10 @@ package tools
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"store/pkg/config"
 	"time"
 )
 
-func CreateToken(uid string, conf *config.GlobalConfig) (string, error) {
-	expiry := conf.JWT.Expiry
+func CreateToken(uid string, expiry int, secret []byte) (string, error) {
 	claims := jwt.MapClaims{
 		"authorized": true,
 		"user_id":    uid,
@@ -17,7 +15,7 @@ func CreateToken(uid string, conf *config.GlobalConfig) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString([]byte(conf.JWT.SecretKey))
+	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return "", err
 	}
@@ -25,12 +23,12 @@ func CreateToken(uid string, conf *config.GlobalConfig) (string, error) {
 	return tokenString, nil
 }
 
-func ParseToken(tokenString string, conf *config.GlobalConfig) (string, error) {
+func ParseToken(tokenString string, secret []byte) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(conf.JWT.SecretKey), nil
+		return secret, nil
 	})
 
 	if err != nil {

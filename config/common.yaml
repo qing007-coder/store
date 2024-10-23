@@ -36,4 +36,5 @@ minio:
   secretKey: ""
 jwt:
   secretKey: "qingqing"
-  expiry: 2
+  accessExpiry: 1
+  refreshExpiry: 3

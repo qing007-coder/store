@@ -23,6 +23,7 @@ func BadRequest(ctx *gin.Context, message string) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusBadRequest,
 		"message": message,
+		"data":    nil,
 	})
 
 	ctx.Abort()
@@ -31,6 +32,7 @@ func BadRequest(ctx *gin.Context, message string) {
 func InternalServerError(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusInternalServerError,
+		"data":    nil,
 		"message": "internal server error",
 	})
 
@@ -50,6 +52,7 @@ func StatusOK(ctx *gin.Context, data interface{}, message string) {
 func UnauthorizationRequest(ctx *gin.Context, message string) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"status":  http.StatusUnauthorized,
+		"data":    nil,
 		"message": message,
 	})
 

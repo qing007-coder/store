@@ -23,8 +23,9 @@ type GlobalConfig struct {
 	} `yaml:"redis"`
 
 	JWT struct {
-		SecretKey string `yaml:"secretKey"`
-		Expiry    int    `yaml:"expiry"`
+		SecretKey     string `yaml:"secretKey"`
+		AccessExpiry  int    `yaml:"accessExpiry"`
+		RefreshExpiry int    `yaml:"refreshExpiry"`
 	} `yaml:"jwt"`
 
 	Elasticsearch struct {
