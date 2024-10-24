@@ -16,6 +16,7 @@ import (
 	"store/pkg/config"
 	"store/pkg/redis"
 	"store/pkg/rules"
+	"store/pkg/tools"
 	"time"
 )
 
@@ -78,31 +79,7 @@ func (s *Server) UserAuthorizeHandler(w http.ResponseWriter, r *http.Request) (s
 		return "", errors.ErrInvalidRequest
 	}
 
-	//// 验证 JWT
-	//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-	//	// 验证签名方法
-	//	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-	//		return nil, errors.New("invalidToken")
-	//	}
-	//	return []byte("密钥miyao"), nil
-	//})
-	//
-	//if err != nil || !token.Valid {
-	//	return "", errors.New("invalidToken")
-	//}
-	//
-	//// 提取用户信息
-	//claims, ok := token.Claims.(jwt.MapClaims)
-	//if !ok || !token.Valid {
-	//	return "", errors.New("invalidToken")
-	//}
-	//
-	//userID := claims["userID"].(string) // 假设用户 ID 存储在 claims 中
-	//return userID, nil                  // 返回用户 ID
-
-	//s.rdb.Get(s.ctx, )
-
-	return "31432342342", nil
+	return tools.ParseToken(token[7:], []byte(s.conf.JWT.SecretKey))
 }
 
 // ClientScopeHandler 验证client的scope是否合规

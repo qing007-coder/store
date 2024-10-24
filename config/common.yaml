@@ -1,12 +1,12 @@
 redis:
-  addr: "127.0.0.1"
+  addr: "10.3.0.42"
   port: "6379"
   password: ""
 mysql:
   addr: "127.0.0.1"
   port: "3306"
   password: "040824"
-  database: "chat"
+  database: "store"
   name: "root"
   conf: "charset=utf8&parseTime=true&loc=Local"
 consul:

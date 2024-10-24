@@ -1,10 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"store/pkg/config"
-)
-
 func main() {
 	//conf := sarama.NewConfig()
 	//conf.Net.MaxOpenRequests = 2
@@ -29,11 +24,14 @@ func main() {
 	//fmt.Println("success")
 	//select {}
 
-	conf, err := config.NewGlobalConfig()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	//conf, err := config.NewGlobalConfig()
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//fmt.Println(conf)
 
-	fmt.Println(conf)
+	//token := "Bearer kjkjk"
+	//fmt.Println(token[7:])
 }

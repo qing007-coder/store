@@ -13,7 +13,7 @@ func NewClient(conf *config.GlobalConfig) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s",
 		conf.Mysql.Name,
 		conf.Mysql.Password,
-		conf.Mysql.Address,
+		conf.Mysql.Addr,
 		conf.Mysql.Port,
 		conf.Mysql.Database,
 		conf.Mysql.Conf,

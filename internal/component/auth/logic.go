@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
@@ -12,23 +14,28 @@ import (
 	"store/pkg/redis"
 	"store/pkg/rules"
 	"store/pkg/sso/server"
+	"store/pkg/task_queue"
 	"store/pkg/tools"
 )
 
 type AuthApi struct {
+	ctx  context.Context
 	srv  *server.Server
 	db   *gorm.DB
 	rdb  *redis.Client
 	e    *rules.Enforcer
 	conf *config.GlobalConfig
+	task *task_queue.Client
 }
 
-func NewAuthApi(srv *server.Server, db *gorm.DB, e *rules.Enforcer, conf *config.GlobalConfig) *AuthApi {
+func NewAuthApi(srv *server.Server, db *gorm.DB, e *rules.Enforcer, conf *config.GlobalConfig, task *task_queue.Client) *AuthApi {
 	return &AuthApi{
+		ctx:  context.Background(),
 		srv:  srv,
 		db:   db,
 		e:    e,
 		conf: conf,
+		task: task,
 	}
 }
 
@@ -160,9 +167,77 @@ func (a *AuthApi) Login(ctx *gin.Context) {
 }
 
 func (a *AuthApi) Register(ctx *gin.Context) {
+	var req model.RegisterReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
 
+	data, err := a.rdb.Get(a.ctx, req.Email)
+	if err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	if data != req.VerificationCode {
+		tools.BadRequest(ctx, "验证码错误")
+		return
+	}
+
+	password, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	id := uuid.New().String()
+	a.db.Create(&model.User{
+		ID:       id,
+		Account:  tools.CreateID(),
+		Password: string(password),
+		Email:    req.Email,
+	})
+
+	accessToken, err := tools.CreateToken(id, a.conf.JWT.AccessExpiry, []byte(a.conf.JWT.SecretKey))
+	if err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	refreshToken, err := tools.CreateToken(id, a.conf.JWT.RefreshExpiry, []byte(a.conf.JWT.SecretKey))
+	if err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	tools.StatusOK(ctx, model.Data{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		Expiry:       a.conf.JWT.AccessExpiry,
+		TokenType:    "Bearer",
+	}, "登录成功")
 }
 
 func (a *AuthApi) SendEmail(ctx *gin.Context) {
+	var req model.SendVerificationCodeReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
 
+	var count int64
+	a.db.Where("email = ?", req.Email).Count(&count)
+	if count > 0 {
+		tools.BadRequest(ctx, "邮箱已注册")
+		return
+	}
+
+	if err := a.task.SendTask(task_queue.EMAIL, model.EmailTask{
+		Email: req.Email,
+	}); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	tools.StatusOK(ctx, nil, "发送成功")
 }
