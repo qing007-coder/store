@@ -28,7 +28,6 @@ func (c *Client) init(conf *config.GlobalConfig) {
 		Addr: fmt.Sprintf("%s:%s", conf.Redis.Addr, conf.Redis.Port),
 		DB:   conf.Redis.DB,
 	})
-	defer c.client.Close()
 }
 
 func (c *Client) SendTask(taskType string, payload interface{}) error {
@@ -45,12 +44,11 @@ func (c *Client) sendEmail(payload interface{}) error {
 	if err != nil {
 		return err
 	}
-	task := asynq.NewTask("email:delivery", data)
-	info, err := c.client.Enqueue(task)
+	task := asynq.NewTask(EMAILDELIVERY, data)
+	_, err = c.client.Enqueue(task, asynq.Queue(DEFAULT))
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("info:", info)
 	return nil
 }

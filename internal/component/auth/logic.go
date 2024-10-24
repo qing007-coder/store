@@ -16,6 +16,7 @@ import (
 	"store/pkg/sso/server"
 	"store/pkg/task_queue"
 	"store/pkg/tools"
+	"time"
 )
 
 type AuthApi struct {
@@ -28,7 +29,7 @@ type AuthApi struct {
 	task *task_queue.Client
 }
 
-func NewAuthApi(srv *server.Server, db *gorm.DB, e *rules.Enforcer, conf *config.GlobalConfig, task *task_queue.Client) *AuthApi {
+func NewAuthApi(srv *server.Server, db *gorm.DB, e *rules.Enforcer, conf *config.GlobalConfig, task *task_queue.Client, rdb *redis.Client) *AuthApi {
 	return &AuthApi{
 		ctx:  context.Background(),
 		srv:  srv,
@@ -36,6 +37,7 @@ func NewAuthApi(srv *server.Server, db *gorm.DB, e *rules.Enforcer, conf *config
 		e:    e,
 		conf: conf,
 		task: task,
+		rdb:  rdb,
 	}
 }
 
@@ -55,6 +57,18 @@ func (a *AuthApi) ExchangeToken(ctx *gin.Context) {
 		return
 	}
 	fmt.Println("success")
+}
+
+func (a *AuthApi) storeToken(accessToken, refreshToken string) error {
+	code := tools.CreateID()
+	if err := a.rdb.Set(a.ctx, accessToken, code, time.Hour*time.Duration(24*a.conf.JWT.AccessExpiry)); err != nil {
+		return err
+	}
+
+	if err := a.rdb.Set(a.ctx, refreshToken, code, time.Hour*time.Duration(24*a.conf.JWT.RefreshExpiry)); err != nil {
+		return err
+	}
+
 }
 
 func (a *AuthApi) ValidateToken(ctx *gin.Context) {
@@ -152,11 +166,7 @@ func (a *AuthApi) Login(ctx *gin.Context) {
 		return
 	}
 
-	refreshToken, err := tools.CreateToken(user.ID, a.conf.JWT.RefreshExpiry, []byte(a.conf.JWT.SecretKey))
-	if err != nil {
-		tools.BadRequest(ctx, err.Error())
-		return
-	}
+	refreshToken := uuid.New().String()
 
 	tools.StatusOK(ctx, model.Data{
 		AccessToken:  accessToken,
@@ -173,7 +183,7 @@ func (a *AuthApi) Register(ctx *gin.Context) {
 		return
 	}
 
-	data, err := a.rdb.Get(a.ctx, req.Email)
+	data, err := a.rdb.Get(a.ctx, req.Email+".send")
 	if err != nil {
 		tools.BadRequest(ctx, err.Error())
 		return
@@ -204,11 +214,7 @@ func (a *AuthApi) Register(ctx *gin.Context) {
 		return
 	}
 
-	refreshToken, err := tools.CreateToken(id, a.conf.JWT.RefreshExpiry, []byte(a.conf.JWT.SecretKey))
-	if err != nil {
-		tools.BadRequest(ctx, err.Error())
-		return
-	}
+	refreshToken := uuid.New().String()
 
 	tools.StatusOK(ctx, model.Data{
 		AccessToken:  accessToken,
@@ -222,6 +228,12 @@ func (a *AuthApi) SendEmail(ctx *gin.Context) {
 	var req model.SendVerificationCodeReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	data, err := a.rdb.Get(a.ctx, req.Email+".send")
+	if err == nil && data != "" {
+		tools.BadRequest(ctx, "发送验证码过于频繁")
 		return
 	}
 

@@ -26,9 +26,10 @@ mongoDB:
   port: "27017"
   database: "chat"
 email:
-  account: "1457800511@qq.com"
-  password: "hchvyiowagokbabf"
+  username: "1457800511@qq.com"
+  password: "mpfbwsxwakbbfgdg"
   host: "smtp.qq.com"
+  port: 587
 minio:
   endPoint: "127.0.0.1"
   port: "9000"

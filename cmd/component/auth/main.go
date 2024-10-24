@@ -28,7 +28,7 @@ func main() {
 	e := email.NewServer(conf)
 	queue := task_queue.NewClient(conf, e)
 	srv := server.NewServer(rdb, db, conf, enforcer)
-	authApi := auth.NewAuthApi(srv, db, enforcer, conf, queue)
+	authApi := auth.NewAuthApi(srv, db, enforcer, conf, queue, rdb)
 	router := auth.NewRouter(authApi)
 	if err := router.Run(); err != nil {
 		fmt.Println(err)
