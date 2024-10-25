@@ -2,8 +2,10 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -59,16 +61,35 @@ func (a *AuthApi) ExchangeToken(ctx *gin.Context) {
 	fmt.Println("success")
 }
 
-func (a *AuthApi) storeToken(accessToken, refreshToken string) error {
+func (a *AuthApi) storeToken(accessToken, refreshToken, uid string) error {
 	code := tools.CreateID()
-	if err := a.rdb.Set(a.ctx, accessToken, code, time.Hour*time.Duration(24*a.conf.JWT.AccessExpiry)); err != nil {
+	accessExpiry := time.Hour * time.Duration(24*a.conf.JWT.AccessExpiry)
+	if err := a.rdb.Set(a.ctx, accessToken, code, accessExpiry); err != nil {
 		return err
 	}
 
-	if err := a.rdb.Set(a.ctx, refreshToken, code, time.Hour*time.Duration(24*a.conf.JWT.RefreshExpiry)); err != nil {
+	refreshExpiry := time.Hour * time.Duration(24*a.conf.JWT.RefreshExpiry)
+	if err := a.rdb.Set(a.ctx, refreshToken, code, refreshExpiry); err != nil {
 		return err
 	}
 
+	token := models.Token{
+		ClientID:         "gateway",
+		UserID:           uid,
+		Access:           accessToken,
+		AccessCreateAt:   time.Now(),
+		AccessExpiresIn:  accessExpiry,
+		Refresh:          refreshToken,
+		RefreshCreateAt:  time.Now(),
+		RefreshExpiresIn: refreshExpiry,
+		Scope:            "access",
+	}
+	data, err := json.Marshal(&token)
+	if err != nil {
+		return err
+	}
+
+	return a.rdb.Set(a.ctx, code, data, refreshExpiry)
 }
 
 func (a *AuthApi) ValidateToken(ctx *gin.Context) {
@@ -167,6 +188,10 @@ func (a *AuthApi) Login(ctx *gin.Context) {
 	}
 
 	refreshToken := uuid.New().String()
+	if err := a.storeToken(accessToken, refreshToken, user.ID); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
 
 	tools.StatusOK(ctx, model.Data{
 		AccessToken:  accessToken,
@@ -215,6 +240,10 @@ func (a *AuthApi) Register(ctx *gin.Context) {
 	}
 
 	refreshToken := uuid.New().String()
+	if err := a.storeToken(accessToken, refreshToken, id); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
 
 	tools.StatusOK(ctx, model.Data{
 		AccessToken:  accessToken,
@@ -231,14 +260,14 @@ func (a *AuthApi) SendEmail(ctx *gin.Context) {
 		return
 	}
 
-	data, err := a.rdb.Get(a.ctx, req.Email+".send")
+	data, err := a.rdb.Get(a.ctx, req.Email)
 	if err == nil && data != "" {
 		tools.BadRequest(ctx, "发送验证码过于频繁")
 		return
 	}
 
 	var count int64
-	a.db.Where("email = ?", req.Email).Count(&count)
+	a.db.Model(&model.User{}).Where("email = ?", req.Email).Count(&count)
 	if count > 0 {
 		tools.BadRequest(ctx, "邮箱已注册")
 		return

@@ -50,6 +50,8 @@ func (s *Server) init() {
 		IsGenerateRefresh: true,
 	}) // 设置token的配置
 
+	//tokenStore := NewTokeStore(s.rdb, s.conf)
+	//manager.MapTokenStorage(tokenStore) // 设置存储token的配置
 	manager.MapTokenStorage(redis_.NewRedisStore(s.rdb.GetConfig(s.conf))) // 设置存储token的配置
 	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("qing", []byte("密钥miyao"), jwt.SigningMethodHS256))
 	manager.MapAuthorizeGenerate(generates.NewAuthorizeGenerate())
