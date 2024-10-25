@@ -65,10 +65,10 @@ func (s *Server) emailDelivery(ctx context.Context, task *asynq.Task) error {
 		return err
 	}
 
-	if err := s.rdb.Set(ctx, e.Email, 1, time.Minute); err != nil {
+	if err := s.rdb.Set(ctx, e.Email, code, time.Minute); err != nil {
 		return err
 	}
-	if err := s.rdb.Set(ctx, e.Email+".send", code, time.Minute*10); err != nil {
+	if err := s.rdb.Set(ctx, e.Email+".send", 1, time.Minute*10); err != nil {
 		return err
 	}
 	return nil

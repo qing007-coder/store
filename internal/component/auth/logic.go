@@ -208,7 +208,7 @@ func (a *AuthApi) Register(ctx *gin.Context) {
 		return
 	}
 
-	data, err := a.rdb.Get(a.ctx, req.Email+".send")
+	data, err := a.rdb.Get(a.ctx, req.Email)
 	if err != nil {
 		tools.BadRequest(ctx, err.Error())
 		return
