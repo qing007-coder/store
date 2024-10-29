@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package friend_master;
+option go_package = "./internal/proto/merchandise";
+
+service MerchandiseService {
+  rpc PutAwayMerchandise (PutAwayMerchandiseReq) returns (PutAwayMerchandiseResp);
+  rpc RemoveMerchandise (RemoveMerchandiseReq) returns (RemoveMerchandiseResp);
+  rpc UpdateMerchandiseReq (UpdateMerchandiseReq) returns (UpdateMerchandiseResp);
+  rpc GetMerchandiseDetailsReq (GetMerchandiseDetailsReq) returns (GetMerchandiseDetailsResp);
+  rpc SearchReq (SearchReq) returns (SearchResp);
+  rpc SearchByCategoryReq (SearchByCategoryReq) returns (SearchByCategoryResp);
+  rpc AddMerchandiseStyleReq (AddMerchandiseStyleReq) returns (AddMerchandiseStyleResp);
+  rpc RemoveMerchandiseStyleReq (RemoveMerchandiseStyleReq) returns (RemoveMerchandiseStyleResp);
+  rpc UpdateMerchandiseStyleReq (UpdateMerchandiseStyleReq) returns (UpdateMerchandiseStyleResp);
+  rpc GetMerchandiseStyleListReq (GetMerchandiseStyleListReq) returns (GetMerchandiseStyleListResp);
+  rpc GetMerchandiseStyleDetailsReq (GetMerchandiseStyleDetailsReq) returns (GetMerchandiseStyleDetailsResp);
+}
+
+message PutAwayMerchandiseReq {
+  string name = 1;
+  string info = 2;
+  repeated string pictureList = 3;
+  string delivery = 4;
+  string category = 5;
+}
+
+message PutAwayMerchandiseResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message RemoveMerchandiseReq {
+  string id = 1;
+}
+
+message RemoveMerchandiseResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message UpdateMerchandiseReq {
+  string id = 1;
+  string name = 2;
+  string info = 3;
+  repeated string pictureList = 4;
+  string delivery = 5;
+  string category = 6;
+}
+
+message UpdateMerchandiseResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message GetMerchandiseDetailsReq {
+  string id = 1;
+}
+
+message GetMerchandiseDetailsResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message SearchReq {
+  string content = 1;
+  string req = 2;
+  string size = 3;
+}
+
+message SearchResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message SearchByCategoryReq {
+  string content = 1;
+  string req = 2;
+  string size = 3;
+}
+
+message SearchByCategoryResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message AddMerchandiseStyleReq {
+  string merchandiseID = 1;
+  string name = 2;
+  string info = 3;
+  string picture = 4;
+  float price = 5;
+  uint32 stock = 6;
+  string status = 7;
+}
+
+message AddMerchandiseStyleResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message RemoveMerchandiseStyleReq {
+  string id = 1;
+}
+
+message RemoveMerchandiseStyleResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message UpdateMerchandiseStyleReq {
+  string id = 1;
+  string name = 2;
+  string info = 3;
+  string picture = 4;
+  string price = 5;
+  string stock = 6;
+  string status = 7;
+}
+
+message UpdateMerchandiseStyleResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message GetMerchandiseStyleListReq {
+  string merchandiseID = 1;
+}
+
+message GetMerchandiseStyleListResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+message GetMerchandiseStyleDetailsReq {
+  string id = 1;
+}
+
+message GetMerchandiseStyleDetailsResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
