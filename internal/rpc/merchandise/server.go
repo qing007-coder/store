@@ -20,7 +20,7 @@ type Server struct {
 	merchandise *Merchandise
 }
 
-func NewServer(conf *config.GlobalConfig, m *middleware.AuthMiddleware, b *base.Base) (*Server, error) {
+func NewServer(conf *config.GlobalConfig, m *middleware.AuthMiddleware, b base.Base) (*Server, error) {
 	s := &Server{
 		conf:        conf,
 		m:           m,

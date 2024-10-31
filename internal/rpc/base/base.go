@@ -24,16 +24,16 @@ type Base struct {
 	ES       map[string]*elasticsearch.Elasticsearch
 }
 
-func NewBase(index []string) (*Base, error) {
+func NewBase(index []string) (Base, error) {
 	ctx := context.Background()
 	conf, err := config.NewGlobalConfig()
 	if err != nil {
-		return nil, err
+		return Base{}, err
 	}
 
 	db, err := mysql.NewClient(conf)
 	if err != nil {
-		return nil, err
+		return Base{}, err
 	}
 
 	rdb := redis.NewClient(conf)
@@ -52,20 +52,20 @@ func NewBase(index []string) (*Base, error) {
 	}
 	p, err := kafka.NewProducer(&setting)
 	if err != nil {
-		return nil, err
+		return Base{}, err
 	}
 
 	es := make(map[string]*elasticsearch.Elasticsearch)
 	for _, i := range index {
 		client, err := elasticsearch.NewClient(ctx, fmt.Sprintf("%s:%s", conf.Elasticsearch.Addr, conf.Elasticsearch.Port), i)
 		if err != nil {
-			return nil, err
+			return Base{}, err
 		}
 		es[i] = client
 	}
 
 	l := logger.NewLogger(p)
-	return &Base{
+	return Base{
 		Ctx:      ctx,
 		DB:       db,
 		RDB:      rdb,
