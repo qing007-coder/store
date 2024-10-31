@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"fmt"
 	"github.com/IBM/sarama"
 )
 
@@ -52,6 +53,7 @@ func (c *Consumer) Subscribe(topic string, partition int32, offset int64) error 
 }
 
 func (c *Consumer) Handler(worker sarama.PartitionConsumer) {
+	fmt.Println("working ..........")
 	for {
 		select {
 		case message := <-worker.Messages():

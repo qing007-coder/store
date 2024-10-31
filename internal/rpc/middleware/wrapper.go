@@ -28,7 +28,7 @@ func (a *AuthMiddleware) Auth(fn server.HandlerFunc) server.HandlerFunc {
 		}
 
 		fmt.Println("token:", token)
-		authURL := "127.0.0.1:8081"
+		authURL := "http://127.0.0.1:8081/validate_token"
 		client := new(http.Client)
 		request, err := http.NewRequest("GET", authURL, nil)
 		if err != nil {
@@ -51,7 +51,7 @@ func (a *AuthMiddleware) Auth(fn server.HandlerFunc) server.HandlerFunc {
 			return err
 		}
 
-		if res.Code != 400 {
+		if res.Code != 200 {
 			fmt.Println(res.Message)
 			return errors.New(res.Message)
 		}

@@ -1,13 +1,31 @@
 package model
 
-import "time"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type User struct {
-	ID       string `gorm:"primaryKey"`
-	Account  string
-	Name     string
-	Password string
-	Email    string
+	ID           string    `gorm:"primaryKey"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Account      string    `json:"account"`
+	Nickname     string    `json:"nickname"`
+	Introduction string    `json:"introduction"`
+	Gender       string    `json:"gender"`
+	Sign         string    `json:"sign"`
+	Password     string    `json:"password"`
+	Email        string    `json:"email"`
+	Avatar       string    `json:"avatar"`
+}
+
+type ReceiverAddress struct {
+	gorm.Model
+	DetailedAddress string `json:"detailed_address"`
+	ReceiverName    string `json:"receiver_name"`
+	PhoneNumber     string `json:"phone_number"`
+	Label           string `json:"label"`
+	UserID          string `json:"user_id"`
 }
 
 type Order struct {
@@ -38,4 +56,13 @@ type Client struct {
 	Secret string
 	Domain string
 	UserID string `json:"user_id"`
+}
+
+// MerchantRecord 商家行为记录
+type MerchantRecord struct {
+	ID     string    `json:"id"`
+	Time   time.Time `json:"time"`
+	UserID string    `json:"user_id"`
+	Action string    `json:"action"`
+	Source string    `json:"source"`
 }

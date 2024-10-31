@@ -5,22 +5,34 @@ import (
 	"fmt"
 	"github.com/IBM/sarama"
 	"store/internal/component/logger"
+	"store/pkg/config"
 	"store/pkg/elasticsearch"
+	"store/pkg/errors"
 	"store/pkg/kafka"
 )
 
 func main() {
-	es, err := elasticsearch.NewClient(context.Background(), "http://192.168.152.128:9200", "log")
-	_ = es.CreateIndex()
+	co, err := config.NewGlobalConfig()
+	if err != nil {
+		errors.HandleError(err)
+		return
+	}
+
+	es, err := elasticsearch.NewClient(context.Background(), fmt.Sprintf("%s:%s", co.Elasticsearch.Addr, co.Elasticsearch.Port), "log")
 	if err != nil {
 		fmt.Println("err:", err)
 		return
 	}
 
+	//if err := es.CreateIndex(); err != nil {
+	//	errors.HandleError(err)
+	//	return
+	//}
+
 	conf := sarama.NewConfig()
 	conf.Net.MaxOpenRequests = 2
 	setting := kafka.Setting{
-		Addr: []string{"192.168.152.128:9092"},
+		Addr: []string{fmt.Sprintf("%s:%s", co.Kafka.Addr, co.Kafka.Port)},
 		Conf: conf,
 	}
 	c, err := kafka.NewConsumer(&setting)

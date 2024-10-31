@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -34,6 +35,7 @@ func (l *Logger) init() {
 }
 
 func (l *Logger) Write(data []byte) (n int, err error) {
+	fmt.Println(string(data))
 	l.producer.Publish(&sarama.ProducerMessage{
 		Topic:  constant.LOGTOPIC,
 		Offset: 0,
@@ -54,7 +56,7 @@ func (l *Logger) Info(message, source string) {
 
 func (l *Logger) Error(message, source string) {
 	l.logger.Error(message,
-		zap.Time("time", time.Now()),
+		zap.Int64("time", time.Now().Unix()),
 		zap.String("source", source),
 		zap.String("id", tools.CreateID()),
 	)

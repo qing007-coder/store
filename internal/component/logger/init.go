@@ -33,7 +33,7 @@ func (l *LogConsumer) Run() error {
 
 func (l *LogConsumer) HandleLog(message *sarama.ConsumerMessage) {
 	var lg model.Log
-	//fmt.Println(string(message.Value))
+	fmt.Println(string(message.Value))
 	if err := json.Unmarshal(message.Value, &lg); err != nil {
 		fmt.Println("err:", err)
 		return

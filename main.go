@@ -1,10 +1,16 @@
 package main
 
+import (
+	"fmt"
+	"store/pkg/errors"
+	"store/pkg/tools"
+)
+
 func main() {
 	//conf := sarama.NewConfig()
 	//conf.Net.MaxOpenRequests = 2
 	//setting := kafka.Setting{
-	//	Addr: []string{"192.168.152.128:9092"},
+	//	Addr: []string{"10.3.0.42:9092"},
 	//	Conf: conf,
 	//	SuccessHandler: func(msg *sarama.ProducerMessage) {
 	//		fmt.Println("success:", msg.Value)
@@ -21,6 +27,8 @@ func main() {
 	//
 	//l := logger.NewLogger(p)
 	//l.Info("id:12,action:access", "gateway")
+	//time.Sleep(time.Second)
+	//l.Error("sadfa", "aaaaa")
 	//fmt.Println("success")
 	//select {}
 
@@ -35,4 +43,18 @@ func main() {
 	//token := "Bearer kjkjk"
 	//fmt.Println(token[7:])
 
+	cipher, err := tools.Encrypt([]byte("role"), "0123456789012345")
+	if err != nil {
+		errors.HandleError(err)
+		return
+	}
+	fmt.Println(cipher)
+
+	data, err := tools.Decrypt(cipher, "0123456789012345")
+	if err != nil {
+		errors.HandleError(err)
+		return
+	}
+
+	fmt.Println(string(data))
 }

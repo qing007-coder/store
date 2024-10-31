@@ -68,8 +68,10 @@ message GetMerchandiseDetailsResp {
 
 message SearchReq {
   string content = 1;
-  string req = 2;
-  string size = 3;
+  int32 time = 2;
+  int32 sales = 3;
+  int32 req = 4;
+  int32 size = 5;
 }
 
 message SearchResp {
@@ -79,9 +81,11 @@ message SearchResp {
 }
 
 message SearchByCategoryReq {
-  string content = 1;
-  string req = 2;
-  string size = 3;
+  string category = 1;
+  int32 time = 2;
+  int32 sales = 3;
+  int32 req = 4;
+  int32 size = 5;
 }
 
 message SearchByCategoryResp {
@@ -121,8 +125,8 @@ message UpdateMerchandiseStyleReq {
   string name = 2;
   string info = 3;
   string picture = 4;
-  string price = 5;
-  string stock = 6;
+  float price = 5;
+  int32 stock = 6;
   string status = 7;
 }
 
@@ -134,6 +138,8 @@ message UpdateMerchandiseStyleResp {
 
 message GetMerchandiseStyleListReq {
   string merchandiseID = 1;
+  int32 req = 4;
+  int32 size = 5;
 }
 
 message GetMerchandiseStyleListResp {

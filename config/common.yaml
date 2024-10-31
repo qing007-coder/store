@@ -10,11 +10,11 @@ mysql:
   name: "root"
   conf: "charset=utf8&parseTime=true&loc=Local"
 consul:
-  addr: "121212"
-  port: "1212"
-  name: "sdfa"
+  addr: "10.3.0.42"
+  port: "8500"
+  name: "merchandise"
 kafka:
-  addr: "127.0.0.1"
+  addr: "10.3.0.42"
   port: "9092"
 logger:
   maxSize: 1
@@ -39,3 +39,6 @@ jwt:
   secretKey: "qingqing"
   accessExpiry: 1
   refreshExpiry: 3
+elasticsearch:
+  addr: "http://10.3.0.42"
+  port: "9200"
