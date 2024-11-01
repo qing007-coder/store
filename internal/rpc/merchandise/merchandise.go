@@ -16,11 +16,11 @@ import (
 )
 
 type Merchandise struct {
-	base.Base
-	MerchandiseStyle
+	*base.Base
+	*MerchandiseStyle
 }
 
-func NewMerchandise(b base.Base) *Merchandise {
+func NewMerchandise(b *base.Base) *Merchandise {
 	return &Merchandise{
 		b,
 		NewMerchandiseStyle(b),

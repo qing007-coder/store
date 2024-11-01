@@ -15,11 +15,11 @@ import (
 )
 
 type MerchandiseStyle struct {
-	base.Base
+	*base.Base
 }
 
-func NewMerchandiseStyle(b base.Base) MerchandiseStyle {
-	return MerchandiseStyle{b}
+func NewMerchandiseStyle(b *base.Base) *MerchandiseStyle {
+	return &MerchandiseStyle{b}
 }
 
 func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, req *merchandise.AddMerchandiseStyleReq, resp *merchandise.AddMerchandiseStyleResp) error {
