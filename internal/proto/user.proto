@@ -25,11 +25,10 @@ service UserService {
 
 // 更改用户信息
 message UpdatePersonalInfoReq {
-  string id = 1;
-  string nickname = 2;
-  string introduction = 3;
-  string gender = 4;
-  string sign = 5;
+  string nickname = 1;
+  string introduction = 2;
+  string gender = 3;
+  string sign = 4;
 }
 
 message UpdatePersonalInfoResp {

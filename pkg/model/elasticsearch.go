@@ -10,7 +10,7 @@ type Merchandise struct {
 	PictureList []string `json:"picture_list"` // 照片路径
 	MerchantID  string   `json:"merchant_id"`  // 商家id
 	Delivery    string   `json:"delivery"`     // 快递发货情况
-	Category    string   `json:"qu"`           // 商品分类
+	Category    string   `json:"category"`     // 商品分类
 	Views       uint     `json:"views"`        // 浏览量
 	SalesVolume uint     `json:"sales_volume"` // 购买量
 }
