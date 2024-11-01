@@ -8,6 +8,7 @@ import (
 	"store/internal/proto/merchandise"
 	"store/internal/rpc/base"
 	"store/pkg/constant"
+	"store/pkg/constant/resource"
 	rsp "store/pkg/constant/response"
 	"store/pkg/errors"
 	"store/pkg/model"
@@ -43,7 +44,7 @@ func (m *Merchandise) PutAwayMerchandise(ctx context.Context, req *merchandise.P
 		Views:       0,
 		SalesVolume: 0,
 	}, id); err != nil {
-		m.Logger.Error(errors.EsCreateError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.EsCreateError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
 
@@ -64,7 +65,7 @@ func (m *Merchandise) PutAwayMerchandise(ctx context.Context, req *merchandise.P
 func (m *Merchandise) RemoveMerchandise(ctx context.Context, req *merchandise.RemoveMerchandiseReq, resp *merchandise.RemoveMerchandiseResp) error {
 	uid := ctx.Value("user_id").(string)
 	if err := m.ES[constant.MERCHANDISE].DeleteDocument(req.Id); err != nil {
-		m.Logger.Error(errors.EsDeleteError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.EsDeleteError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
 
@@ -106,7 +107,7 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, req *merchandise.Up
 	queries["updated_at"] = time.Now().Unix()
 
 	if err := m.ES[constant.MERCHANDISE].Update(req.Id, queries); err != nil {
-		m.Logger.Error(errors.EsUpdateError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.EsUpdateError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
 
@@ -127,7 +128,7 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, req *merchandise.Up
 func (m *Merchandise) GetMerchandiseDetails(ctx context.Context, req *merchandise.GetMerchandiseDetailsReq, resp *merchandise.GetMerchandiseDetailsResp) error {
 	data, err := m.ES[constant.MERCHANDISE].GetDocumentByID(req.GetId())
 	if err != nil {
-		m.Logger.Error(errors.EsSearchError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
 
@@ -150,7 +151,7 @@ func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, re
 			"order": "asc",
 		})
 	} else {
-		m.Logger.Error(errors.UndefinedValue("time").Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.UndefinedValue("time").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知time值")
 	}
 
@@ -165,7 +166,7 @@ func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, re
 			"order": "asc",
 		})
 	} else {
-		m.Logger.Error(errors.UndefinedValue("sales").Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.UndefinedValue("sales").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知sales值")
 	}
 
@@ -198,7 +199,7 @@ func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, re
 
 	response, err := m.ES[constant.MERCHANDISE].Search(nil, shouldQueries, sort, int(req.Req*req.Size), int(req.Size))
 	if err != nil {
-		m.Logger.Error(errors.EsSearchError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
 
@@ -206,7 +207,7 @@ func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, re
 	for _, hit := range response.Hits.Hits {
 		var mer model.Merchandise
 		if err := json.Unmarshal(hit.Source_, &mer); err != nil {
-			m.Logger.Error(errors.JsonUnmarshalError.Error(), constant.MERCHANDISE)
+			m.Logger.Error(errors.JsonUnmarshalError.Error(), resource.MERCHANDISEMODULE)
 			return err
 		}
 
@@ -214,7 +215,7 @@ func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, re
 	}
 	data, err := json.Marshal(&ms)
 	if err != nil {
-		m.Logger.Error(errors.JsonMarshalError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.JsonMarshalError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
 
@@ -238,7 +239,7 @@ func (m *Merchandise) SearchByCategory(ctx context.Context, req *merchandise.Sea
 			"order": "asc",
 		})
 	} else {
-		m.Logger.Error(errors.UndefinedValue("time").Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.UndefinedValue("time").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知time值")
 	}
 
@@ -253,7 +254,7 @@ func (m *Merchandise) SearchByCategory(ctx context.Context, req *merchandise.Sea
 			"order": "asc",
 		})
 	} else {
-		m.Logger.Error(errors.UndefinedValue("sales").Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.UndefinedValue("sales").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知sales值")
 	}
 
@@ -267,7 +268,7 @@ func (m *Merchandise) SearchByCategory(ctx context.Context, req *merchandise.Sea
 
 	response, err := m.ES[constant.MERCHANDISE].Search(queries, nil, sort, int(req.Req*req.Size), int(req.Size))
 	if err != nil {
-		m.Logger.Error(errors.EsSearchError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
 
@@ -275,7 +276,7 @@ func (m *Merchandise) SearchByCategory(ctx context.Context, req *merchandise.Sea
 	for _, v := range response.Hits.Hits {
 		var mer model.Merchandise
 		if err := json.Unmarshal(v.Source_, &mer); err != nil {
-			m.Logger.Error(errors.JsonUnmarshalError.Error(), constant.MERCHANDISE)
+			m.Logger.Error(errors.JsonUnmarshalError.Error(), resource.MERCHANDISEMODULE)
 			return err
 		}
 
@@ -284,7 +285,7 @@ func (m *Merchandise) SearchByCategory(ctx context.Context, req *merchandise.Sea
 
 	data, err := json.Marshal(&ms)
 	if err != nil {
-		m.Logger.Error(errors.JsonMarshalError.Error(), constant.MERCHANDISE)
+		m.Logger.Error(errors.JsonMarshalError.Error(), resource.MERCHANDISEMODULE)
 	}
 
 	resp.Code = rsp.OK
