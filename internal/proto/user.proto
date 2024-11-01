@@ -1,0 +1,203 @@
+syntax = "proto3";
+
+package user_master;
+option go_package = "./internal/proto/user";
+
+// protoc --go_out=. --micro_out=. --micro_opt=use_grpc=1 .\internal\proto\user.proto
+
+service UserService {
+  rpc UpdatePersonalInfo (UpdatePersonalInfoReq) returns (UpdatePersonalInfoResp);
+  rpc ModifyPassword (ModifyPasswordReq) returns (ModifyPasswordResp);
+  rpc AddReceiverAddress (AddReceiverAddressReq) returns (AddReceiverAddressResp);
+  rpc DeleteReceiverAddress (DeleteReceiverAddressReq) returns (DeleteReceiverAddressResp);
+  rpc UpdateReceiverAddress (UpdateReceiverAddressReq) returns (UpdateReceiverAddressResp);
+  rpc GetReceiverAddress (GetReceiverAddressReq) returns (GetReceiverAddressResp);
+  rpc AddFavourites (AddFavouritesReq) returns (AddFavouritesResp);
+  rpc DeleteFavourites (DeleteFavouritesReq) returns (DeleteFavouritesResp);
+  rpc GetFavouritesList (GetFavouritesListReq) returns (GetFavouritesListResp);
+  rpc AddFootprint (AddFootprintReq) returns (AddFootprintResp);
+  rpc DeleteFootprint (DeleteFootprintReq) returns (DeleteFootprintResp);
+  rpc GetFootprintList (GetFootprintListReq) returns (GetFootprintListResp);
+  rpc FollowMerchant (FollowMerchantReq) returns (FollowMerchantResp);
+  rpc CancelFollow (CancelFollowReq) returns (CancelFollowResp);
+  rpc GetFollowList (GetFollowListReq) returns (GetFollowListResp);
+}
+
+// 更改用户信息
+message UpdatePersonalInfoReq {
+  string id = 1;
+  string nickname = 2;
+  string introduction = 3;
+  string gender = 4;
+  string sign = 5;
+}
+
+message UpdatePersonalInfoResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 修改密码
+message ModifyPasswordReq {
+  string newPassword = 1;
+  string verifyCode = 2;
+}
+
+message ModifyPasswordResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 新增收货地址
+message AddReceiverAddressReq {
+  string detailedAddress = 1;
+  string receiver = 2;
+  string phone = 3;
+  string label = 4;
+}
+
+message AddReceiverAddressResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 删除收货地址
+message DeleteReceiverAddressReq {
+  string id = 1;
+}
+
+message DeleteReceiverAddressResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 修改收货地址
+message UpdateReceiverAddressReq {
+  string id = 1;
+  string detailedAddress = 2;
+  string receiver = 3;
+  string phone = 4;
+  string label = 5;
+}
+
+message UpdateReceiverAddressResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 查看收货地址
+message GetReceiverAddressReq {
+}
+
+message GetReceiverAddressResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+
+// 收藏
+message AddFavouritesReq {
+  string targetID = 1;
+  string category = 2;
+}
+
+message AddFavouritesResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 取消收藏
+message DeleteFavouritesReq {
+  string targetID = 1;
+}
+
+message DeleteFavouritesResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 获取收藏列表
+message GetFavouritesListReq {
+  string category = 1;
+}
+
+message GetFavouritesListResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 添加足迹
+message AddFootprintReq {
+  string targetID = 1;
+  string category = 2;
+}
+
+message AddFootprintResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 删除足迹
+message DeleteFootprintReq {
+  string targetID = 1;
+}
+
+message DeleteFootprintResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 查看足迹
+message GetFootprintListReq {
+  string category = 1;
+}
+
+message GetFootprintListResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 关注
+message FollowMerchantReq {
+  string merchantID = 1;
+}
+
+message FollowMerchantResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 取关
+message CancelFollowReq {
+  string merchantID = 1;
+}
+
+message CancelFollowResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
+
+// 查看关注列表
+message GetFollowListReq {
+
+}
+
+message GetFollowListResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}

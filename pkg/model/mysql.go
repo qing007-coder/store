@@ -28,6 +28,26 @@ type ReceiverAddress struct {
 	UserID          string `json:"user_id"`
 }
 
+type Favourites struct {
+	gorm.Model
+	UserID   string `json:"user_id"`
+	TargetID string `json:"target_id"` //
+	Category string `json:"category"`
+}
+
+type Footprint struct {
+	gorm.Model
+	UserID   string `json:"user_id"`
+	TargetID string `json:"target_id"`
+	Category string `json:"category"`
+}
+
+type Follow struct {
+	gorm.Model
+	UserID     string `json:"user_id"`
+	MerchantID string `json:"merchant_id"`
+}
+
 type Order struct {
 	ID                 string    `json:"id"`                   // 订单ID
 	UserID             string    `json:"user_id"`              // 用户ID
