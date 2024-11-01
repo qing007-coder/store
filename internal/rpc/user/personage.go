@@ -23,15 +23,18 @@ func NewPersonage(b *base.Base) *Personage {
 
 func (p *Personage) UpdatePersonalInfo(ctx context.Context, req *user.UpdatePersonalInfoReq, resp *user.UpdatePersonalInfoResp) error {
 	uid := ctx.Value("user_id").(string)
-	p.DB.Where("id = ?", uid).Updates(&model.User{
+	if err := p.DB.Where("id = ?", uid).Updates(&model.User{
 		Nickname:     req.GetNickname(),
 		Introduction: req.GetIntroduction(),
 		Gender:       req.GetGender(),
 		Sign:         req.GetSign(),
 		UpdatedAt:    time.Now(),
-	})
+	}).Error; err != nil {
+		p.Logger.Error(errors.DBCreateError.Error(), resource.USERMODULE)
+		return errors.DBCreateError
+	}
 
-	resp.Code = "200"
+	resp.Code = rsp.OK
 	resp.Message = rsp.UPDATESUCCESS
 
 	return nil
@@ -52,13 +55,13 @@ func (p *Personage) ModifyPassword(ctx context.Context, req *user.ModifyPassword
 
 	code, err := p.RDB.Get(ctx, u.Email)
 	if err != nil {
-		resp.Code = "400"
+		resp.Code = rsp.ERROR
 		resp.Message = "verification code is expiry "
 		return nil
 	}
 
 	if code != req.GetVerificationCode() {
-		resp.Code = "400"
+		resp.Code = rsp.ERROR
 		resp.Message = "wrong verification code"
 		return nil
 	}
@@ -73,7 +76,7 @@ func (p *Personage) ModifyPassword(ctx context.Context, req *user.ModifyPassword
 		Password: string(password),
 	})
 
-	resp.Code = "200"
+	resp.Code = rsp.OK
 	resp.Message = rsp.UPDATESUCCESS
 
 	return nil
