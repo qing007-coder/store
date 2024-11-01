@@ -7,6 +7,7 @@ import (
 	"store/internal/proto/user"
 	"store/internal/rpc/base"
 	"store/pkg/constant/resource"
+	rsp "store/pkg/constant/response"
 	"store/pkg/errors"
 	"store/pkg/model"
 	"time"
@@ -29,6 +30,9 @@ func (p *Personage) UpdatePersonalInfo(ctx context.Context, req *user.UpdatePers
 		Sign:         req.GetSign(),
 		UpdatedAt:    time.Now(),
 	})
+
+	resp.Code = "200"
+	resp.Message = rsp.UPDATESUCCESS
 
 	return nil
 }
@@ -68,6 +72,9 @@ func (p *Personage) ModifyPassword(ctx context.Context, req *user.ModifyPassword
 	p.DB.Where("id = ?", uid).Updates(&model.User{
 		Password: string(password),
 	})
+
+	resp.Code = "200"
+	resp.Message = rsp.UPDATESUCCESS
 
 	return nil
 }
