@@ -40,7 +40,7 @@ message UpdatePersonalInfoResp {
 // 修改密码
 message ModifyPasswordReq {
   string newPassword = 1;
-  string verifyCode = 2;
+  string verificationCode = 2;
 }
 
 message ModifyPasswordResp {

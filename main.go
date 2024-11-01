@@ -1,11 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"store/pkg/errors"
-	"store/pkg/tools"
-)
-
 func main() {
 	//conf := sarama.NewConfig()
 	//conf.Net.MaxOpenRequests = 2
@@ -43,18 +37,28 @@ func main() {
 	//token := "Bearer kjkjk"
 	//fmt.Println(token[7:])
 
-	cipher, err := tools.Encrypt([]byte("role"), "0123456789012345")
-	if err != nil {
-		errors.HandleError(err)
-		return
-	}
-	fmt.Println(cipher)
+	//cipher, err := tools.Encrypt([]byte("role"), "0123456789012345")
+	//if err != nil {
+	//	errors.HandleError(err)
+	//	return
+	//}
+	//fmt.Println(cipher)
+	//
+	//data, err := tools.Decrypt(cipher, "0123456789012345")
+	//if err != nil {
+	//	errors.HandleError(err)
+	//	return
+	//}
+	//
+	//fmt.Println(string(data))
 
-	data, err := tools.Decrypt(cipher, "0123456789012345")
-	if err != nil {
-		errors.HandleError(err)
-		return
-	}
-
-	fmt.Println(string(data))
+	//conf, err := config.NewGlobalConfig()
+	//if err != nil {
+	//	fmt.Println("err:", err)
+	//	return
+	//}
+	//rdb := redis.NewClient(conf)
+	//data, err := rdb.Get(context.Background(), "1851894943077896192")
+	//fmt.Println(data)
+	//fmt.Println(err != nil)
 }
