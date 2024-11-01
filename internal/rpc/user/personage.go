@@ -2,8 +2,10 @@ package user
 
 import (
 	"context"
+	"gorm.io/gorm"
 	"store/internal/proto/user"
 	"store/internal/rpc/base"
+	"store/pkg/errors"
 	"store/pkg/model"
 	"time"
 )
@@ -31,5 +33,11 @@ func (p *Personage) UpdatePersonalInfo(ctx context.Context, req *user.UpdatePers
 
 func (p *Personage) ModifyPassword(ctx context.Context, req *user.ModifyPasswordReq, resp *user.ModifyPasswordResp) error {
 	uid := ctx.Value("user_id").(string)
+	var u model.User
+	if err := p.DB.Where("id = ?", uid).First(&u).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			p.Logger.Error(errors.RecordNotFound.Error(), constant.)
+		}
+	}
 	p.RDB.Get()
 }
