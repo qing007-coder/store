@@ -45,6 +45,7 @@ func (s *Server) init(conf *config.GlobalConfig) error {
 		micro.Version("latest"),
 		micro.Registry(c),           // 必须放底下哎，不然注册中心的优先级会变的
 		micro.WrapHandler(s.m.Auth), // 这个也是 顺序不能变
+		micro.Address(":54181"),
 	)
 
 	s.srv.Init()
