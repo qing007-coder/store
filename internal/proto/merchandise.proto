@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package friend_master;
+package merchandise_master;
 option go_package = "./internal/proto/merchandise";
 
 service MerchandiseService {
