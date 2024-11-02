@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "store/pkg/cmd"
 
+func main() {
+	cmd.NewUserServer()
 }
