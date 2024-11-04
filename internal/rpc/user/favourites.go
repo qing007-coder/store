@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"store/internal/proto/user"
 	"store/internal/rpc/base"
+	"store/internal/rpc/tools"
 	"store/pkg/constant"
 	"store/pkg/constant/resource"
 	rsp "store/pkg/constant/response"
@@ -64,18 +65,11 @@ func (r *Favourites) GetFavouritesList(ctx context.Context, req *user.GetFavouri
 	if req.GetCategory() == constant.MERCHANDISE {
 		var merchandises []model.Merchandise
 		for _, f := range favourites {
-			data, err := r.ES[constant.MERCHANDISE].GetDocumentByID(f.TargetID)
+			m, err := tools.GetMerchandise(f.TargetID, r.ES[constant.MERCHANDISE])
 			if err != nil {
-				r.Logger.Error(errors.EsSearchError.Error(), resource.USERMODULE)
-				return errors.EsSearchError
+				r.Logger.Error(err.Error(), resource.USERMODULE)
+				return err
 			}
-
-			var m model.Merchandise
-			if err := json.Unmarshal(data, &m); err != nil {
-				r.Logger.Error(errors.JsonUnmarshalError.Error(), resource.USERMODULE)
-				return errors.JsonUnmarshalError
-			}
-
 			merchandises = append(merchandises, m)
 		}
 
