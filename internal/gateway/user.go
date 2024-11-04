@@ -168,7 +168,7 @@ func (u *UserApi) UpdateReceiverAddress(ctx *gin.Context) {
 	tools.StatusOK(ctx, nil, resp.GetMessage())
 }
 
-func (u *UserApi) GetReceiverAddressReq(ctx *gin.Context) {
+func (u *UserApi) GetReceiverAddress(ctx *gin.Context) {
 	c := metadata.Set(u.ctx, "Authorization", ctx.GetString("Authorization"))
 	resp, err := u.client.GetReceiverAddress(c, &user.GetReceiverAddressReq{})
 
@@ -244,16 +244,12 @@ func (u *UserApi) DeleteFavourites(ctx *gin.Context) {
 	tools.StatusOK(ctx, nil, resp.GetMessage())
 }
 
-func (u *UserApi) GetFavouritesListReq(ctx *gin.Context) {
-	var req request.GetFavouritesListReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		tools.BadRequest(ctx, errors.ShouldBindJsonError.Error())
-		return
-	}
+func (u *UserApi) GetFavouritesList(ctx *gin.Context) {
+	category := ctx.Query("category")
 
 	c := metadata.Set(u.ctx, "Authorization", ctx.GetString("Authorization"))
 	resp, err := u.client.GetFavouritesList(c, &user.GetFavouritesListReq{
-		Category: req.Category,
+		Category: category,
 	})
 
 	if err != nil {
@@ -329,15 +325,11 @@ func (u *UserApi) DeleteFootprint(ctx *gin.Context) {
 }
 
 func (u *UserApi) GetFootprintList(ctx *gin.Context) {
-	var req request.GetFootprintListReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		tools.BadRequest(ctx, errors.ShouldBindJsonError.Error())
-		return
-	}
+	category := ctx.Query("category")
 
 	c := metadata.Set(u.ctx, "Authorization", ctx.GetString("Authorization"))
 	resp, err := u.client.GetFootprintList(c, &user.GetFootprintListReq{
-		Category: req.Category,
+		Category: category,
 	})
 
 	if err != nil {

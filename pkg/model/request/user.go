@@ -40,10 +40,6 @@ type DeleteFavouritesReq struct {
 	TargetID string `json:"target_id"`
 }
 
-type GetFavouritesListReq struct {
-	Category string `json:"category"`
-}
-
 type AddFootprintReq struct {
 	TargetID string `json:"target_id"`
 	Category string `json:"category"`
@@ -51,10 +47,6 @@ type AddFootprintReq struct {
 
 type DeleteFootprintReq struct {
 	TargetID string `json:"target_id"`
-}
-
-type GetFootprintListReq struct {
-	Category string `json:"category"`
 }
 
 type FollowMerchantReq struct {
