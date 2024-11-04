@@ -54,7 +54,7 @@ func (r *Footprint) GetFollowList(ctx context.Context, req *user.GetFollowListRe
 	uid := ctx.Value("user_id").(string)
 
 	var u []model.User
-	if err := r.DB.Joins("JOIN user ON user.id = follow.merchant_id ").Where("follow.user_id = ?", uid).Find(&u).Error; err != nil {
+	if err := r.DB.Joins("JOIN user ON user.id = follow.merchant_id ").Where("follow.user_id = ?", uid).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&u).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}
@@ -65,9 +65,13 @@ func (r *Footprint) GetFollowList(ctx context.Context, req *user.GetFollowListRe
 		return errors.JsonMarshalError
 	}
 
+	var count int64
+	r.DB.Where("user_id = ?", uid).Count(&count)
+
 	resp.Code = rsp.OK
 	resp.Message = rsp.SEARCHSUCCESS
 	resp.Data = data
+	resp.Total = count
 
 	return nil
 }

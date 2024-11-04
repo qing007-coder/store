@@ -97,8 +97,9 @@ func (r *Footprint) GetFootprintList(ctx context.Context, req *user.GetFootprint
 	//	resp.Data = data
 	//}
 
+	var count int64
 	var footprintList []model.Footprint
-	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Find(&footprintList).Error; err != nil {
+	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Count(&count).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&footprintList).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}
@@ -112,6 +113,7 @@ func (r *Footprint) GetFootprintList(ctx context.Context, req *user.GetFootprint
 	resp.Code = rsp.OK
 	resp.Message = rsp.SEARCHSUCCESS
 	resp.Data = data
+	resp.Total = count
 
 	return nil
 }

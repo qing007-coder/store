@@ -54,8 +54,9 @@ func (r *Favourites) DeleteFavourites(ctx context.Context, req *user.DeleteFavou
 func (r *Favourites) GetFavouritesList(ctx context.Context, req *user.GetFavouritesListReq, resp *user.GetFavouritesListResp) error {
 	uid := ctx.Value("user_id").(string)
 
+	var count int64
 	var favourites []model.Favourites
-	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Find(&favourites).Error; err != nil {
+	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Count(&count).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&favourites).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}
@@ -89,5 +90,6 @@ func (r *Favourites) GetFavouritesList(ctx context.Context, req *user.GetFavouri
 	resp.Code = rsp.OK
 	resp.Message = rsp.SEARCHSUCCESS
 	resp.Data = data
+	resp.Total = count
 	return nil
 }

@@ -71,8 +71,9 @@ func (r *ReceiverAddress) UpdateReceiverAddress(ctx context.Context, req *user.U
 func (r *ReceiverAddress) GetReceiverAddress(ctx context.Context, req *user.GetReceiverAddressReq, resp *user.GetReceiverAddressResp) error {
 	uid := ctx.Value("user_id").(string)
 
+	var count int64
 	var addresses []model.ReceiverAddress
-	r.DB.Where("user_id = ?", uid).Find(&addresses)
+	r.DB.Where("user_id = ?", uid).Count(&count).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&addresses)
 
 	data, err := json.Marshal(&addresses)
 	if err != nil {
@@ -83,6 +84,7 @@ func (r *ReceiverAddress) GetReceiverAddress(ctx context.Context, req *user.GetR
 	resp.Code = rsp.OK
 	resp.Data = data
 	resp.Message = rsp.SEARCHSUCCESS
+	resp.Total = count
 
 	return nil
 }

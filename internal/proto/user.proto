@@ -91,12 +91,15 @@ message UpdateReceiverAddressResp {
 
 // 查看收货地址
 message GetReceiverAddressReq {
+  int32 req = 1;
+  int32 size = 2;
 }
 
 message GetReceiverAddressResp {
   string code = 1;
   string message = 2;
   bytes data = 3;
+  int64 total = 4;
 }
 
 
@@ -126,12 +129,15 @@ message DeleteFavouritesResp {
 // 获取收藏列表
 message GetFavouritesListReq {
   string category = 1;
+  int32 req = 2;
+  int32 size = 3;
 }
 
 message GetFavouritesListResp {
   string code = 1;
   string message = 2;
   bytes data = 3;
+  int64 total = 4;
 }
 
 // 添加足迹
@@ -160,12 +166,15 @@ message DeleteFootprintResp {
 // 查看足迹
 message GetFootprintListReq {
   string category = 1;
+  int32 req = 2;
+  int32 size = 3;
 }
 
 message GetFootprintListResp {
   string code = 1;
   string message = 2;
   bytes data = 3;
+  int64 total = 4;
 }
 
 // 关注
@@ -192,11 +201,13 @@ message CancelFollowResp {
 
 // 查看关注列表
 message GetFollowListReq {
-
+  int32 req = 1;
+  int32 size = 2;
 }
 
 message GetFollowListResp {
   string code = 1;
   string message = 2;
   bytes data = 3;
+  int64 total = 4;
 }
