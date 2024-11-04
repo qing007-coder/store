@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"store/internal/proto/user"
 	"store/internal/rpc/base"
 	"store/pkg/constant/resource"
@@ -52,14 +53,21 @@ func (r *Footprint) CancelFollow(ctx context.Context, req *user.CancelFollowReq,
 func (r *Footprint) GetFollowList(ctx context.Context, req *user.GetFollowListReq, resp *user.GetFollowListResp) error {
 	uid := ctx.Value("user_id").(string)
 
-	var followers []model.Follow
-	if err := r.DB.Joins("JOIN  ON ").Where("user_id = ?", uid).Find(&followers).Error; err != nil {
+	var u []model.User
+	if err := r.DB.Joins("JOIN user ON user.id = follow.merchant_id ").Where("follow.user_id = ?", uid).Find(&u).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}
 
+	data, err := json.Marshal(&u)
+	if err != nil {
+		r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
+		return errors.JsonMarshalError
+	}
+
 	resp.Code = rsp.OK
 	resp.Message = rsp.SEARCHSUCCESS
+	resp.Data = data
 
 	return nil
 }

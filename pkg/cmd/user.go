@@ -10,7 +10,7 @@ import (
 )
 
 func NewUserServer() {
-	b, err := base.NewBase([]string{constant.MERCHANDISE, constant.MERCHANDISESTYLE})
+	b, err := base.NewBase([]string{constant.MERCHANDISE, constant.MERCHANDISESTYLE, constant.MERCHANT})
 	if err != nil {
 		errors.HandleError(err)
 		return

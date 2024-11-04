@@ -2,8 +2,10 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"store/internal/proto/user"
 	"store/internal/rpc/base"
+	"store/pkg/constant"
 	"store/pkg/constant/resource"
 	rsp "store/pkg/constant/response"
 	"store/pkg/errors"
@@ -57,6 +59,33 @@ func (r *Favourites) GetFavouritesList(ctx context.Context, req *user.GetFavouri
 	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Find(&favourites).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
+	}
+
+	if req.GetCategory() == constant.MERCHANDISE {
+		var merchandises []model.Merchandise
+		for _, f := range favourites {
+			data, err := r.ES[constant.MERCHANDISE].GetDocumentByID(f.TargetID)
+			if err != nil {
+				r.Logger.Error(errors.EsSearchError.Error(), resource.USERMODULE)
+				return errors.EsSearchError
+			}
+
+			var m model.Merchandise
+			if err := json.Unmarshal(data, &m); err != nil {
+				r.Logger.Error(errors.JsonUnmarshalError.Error(), resource.USERMODULE)
+				return errors.JsonUnmarshalError
+			}
+
+			merchandises = append(merchandises, m)
+		}
+
+		data, err := json.Marshal(&merchandises)
+		if err != nil {
+			r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
+			return errors.JsonMarshalError
+		}
+
+		resp.Data = data
 	}
 
 	resp.Code = rsp.OK
