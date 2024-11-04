@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"store/internal/proto/user"
 	"store/internal/rpc/base"
-	"store/internal/rpc/tools"
-	"store/pkg/constant"
 	"store/pkg/constant/resource"
 	rsp "store/pkg/constant/response"
 	"store/pkg/errors"
@@ -55,52 +53,65 @@ func (r *Footprint) DeleteFootprint(ctx context.Context, req *user.DeleteFootpri
 func (r *Footprint) GetFootprintList(ctx context.Context, req *user.GetFootprintListReq, resp *user.GetFootprintListResp) error {
 	uid := ctx.Value("user_id").(string)
 
-	if req.GetCategory() == constant.MERCHANT {
-		var u []model.User
-		if err := r.DB.Joins("JOIN user ON user.id = footprint.target_id").Where("footprint.user_id = ? AND footprint.category = ?", uid, req.GetCategory()).Find(&u).Error; err != nil {
-			r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
-			return errors.DBQueryError
-		}
+	//if req.GetCategory() == constant.MERCHANT {
+	//	var u []model.User
+	//	if err := r.DB.Joins("JOIN user ON user.id = footprint.target_id").Where("footprint.user_id = ? AND footprint.category = ?", uid, req.GetCategory()).Find(&u).Error; err != nil {
+	//		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
+	//		return errors.DBQueryError
+	//	}
+	//
+	//	data, err := json.Marshal(&u)
+	//	if err != nil {
+	//		r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
+	//		return errors.JsonMarshalError
+	//	}
+	//
+	//	resp.Data = data
+	//}
+	//
+	//if req.GetCategory() == constant.MERCHANDISE {
+	//	var footprintList []model.Footprint
+	//	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Find(&footprintList).Error; err != nil {
+	//		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
+	//		return errors.DBQueryError
+	//	}
+	//
+	//	var ms []model.Merchandise
+	//
+	//	for _, f := range footprintList {
+	//		m, err := tools.GetMerchandise(f.TargetID, r.ES[constant.MERCHANDISE])
+	//		if err != nil {
+	//			r.Logger.Error(err.Error(), resource.USERMODULE)
+	//			return err
+	//		}
+	//
+	//		ms = append(ms, m)
+	//	}
+	//
+	//	data, err := json.Marshal(&ms)
+	//	if err != nil {
+	//		r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
+	//		return errors.JsonMarshalError
+	//	}
+	//
+	//	resp.Data = data
+	//}
 
-		data, err := json.Marshal(&u)
-		if err != nil {
-			r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
-			return errors.JsonMarshalError
-		}
-
-		resp.Data = data
+	var footprintList []model.Footprint
+	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Find(&footprintList).Error; err != nil {
+		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
+		return errors.DBQueryError
 	}
 
-	if req.GetCategory() == constant.MERCHANDISE {
-		var footprintList []model.Footprint
-		if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Find(&footprintList).Error; err != nil {
-			r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
-			return errors.DBQueryError
-		}
-
-		var ms []model.Merchandise
-
-		for _, f := range footprintList {
-			m, err := tools.GetMerchandise(f.TargetID, r.ES[constant.MERCHANDISE])
-			if err != nil {
-				r.Logger.Error(err.Error(), resource.USERMODULE)
-				return err
-			}
-
-			ms = append(ms, m)
-		}
-
-		data, err := json.Marshal(&ms)
-		if err != nil {
-			r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
-			return errors.JsonMarshalError
-		}
-
-		resp.Data = data
+	data, err := json.Marshal(&footprintList)
+	if err != nil {
+		r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
+		return errors.JsonMarshalError
 	}
 
 	resp.Code = rsp.OK
 	resp.Message = rsp.SEARCHSUCCESS
+	resp.Data = data
 
 	return nil
 }

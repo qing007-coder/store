@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"store/internal/proto/user"
 	"store/internal/rpc/base"
-	"store/internal/rpc/tools"
-	"store/pkg/constant"
 	"store/pkg/constant/resource"
 	rsp "store/pkg/constant/response"
 	"store/pkg/errors"
@@ -62,27 +60,34 @@ func (r *Favourites) GetFavouritesList(ctx context.Context, req *user.GetFavouri
 		return errors.DBQueryError
 	}
 
-	if req.GetCategory() == constant.MERCHANDISE {
-		var merchandises []model.Merchandise
-		for _, f := range favourites {
-			m, err := tools.GetMerchandise(f.TargetID, r.ES[constant.MERCHANDISE])
-			if err != nil {
-				r.Logger.Error(err.Error(), resource.USERMODULE)
-				return err
-			}
-			merchandises = append(merchandises, m)
-		}
+	//if req.GetCategory() == constant.MERCHANDISE {
+	//	var merchandises []model.Merchandise
+	//	for _, f := range favourites {
+	//		m, err := tools.GetMerchandise(f.TargetID, r.ES[constant.MERCHANDISE])
+	//		if err != nil {
+	//			r.Logger.Error(err.Error(), resource.USERMODULE)
+	//			return err
+	//		}
+	//		merchandises = append(merchandises, m)
+	//	}
+	//
+	//	data, err := json.Marshal(&merchandises)
+	//	if err != nil {
+	//		r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
+	//		return errors.JsonMarshalError
+	//	}
+	//
+	//	resp.Data = data
+	//}
 
-		data, err := json.Marshal(&merchandises)
-		if err != nil {
-			r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
-			return errors.JsonMarshalError
-		}
-
-		resp.Data = data
+	data, err := json.Marshal(&favourites)
+	if err != nil {
+		r.Logger.Error(errors.JsonMarshalError.Error(), resource.USERMODULE)
+		return errors.JsonMarshalError
 	}
 
 	resp.Code = rsp.OK
 	resp.Message = rsp.SEARCHSUCCESS
+	resp.Data = data
 	return nil
 }
