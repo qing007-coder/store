@@ -53,7 +53,7 @@ func (r *Footprint) GetFollowList(ctx context.Context, req *user.GetFollowListRe
 	uid := ctx.Value("user_id").(string)
 
 	var followers []model.Follow
-	if err := r.DB.Where("user_iid = ?", uid).Find(&followers).Error; err != nil {
+	if err := r.DB.Joins("JOIN  ON ").Where("user_id = ?", uid).Find(&followers).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}

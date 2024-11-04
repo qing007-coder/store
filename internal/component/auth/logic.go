@@ -13,6 +13,7 @@ import (
 	"store/pkg/config"
 	"store/pkg/errors"
 	"store/pkg/model"
+	"store/pkg/model/request"
 	"store/pkg/redis"
 	"store/pkg/rules"
 	"store/pkg/sso/server"
@@ -111,7 +112,7 @@ func (a *AuthApi) ValidateToken(ctx *gin.Context) {
 }
 
 func (a *AuthApi) RegisterClient(ctx *gin.Context) {
-	var req model.RegisterClientReq
+	var req request.RegisterClientReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		tools.BadRequest(ctx, err.Error())
 		return
@@ -155,7 +156,7 @@ func (a *AuthApi) RegisterClient(ctx *gin.Context) {
 }
 
 func (a *AuthApi) Login(ctx *gin.Context) {
-	var req model.LoginReq
+	var req request.LoginReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		tools.BadRequest(ctx, err.Error())
 		return
@@ -202,7 +203,7 @@ func (a *AuthApi) Login(ctx *gin.Context) {
 }
 
 func (a *AuthApi) Register(ctx *gin.Context) {
-	var req model.RegisterReq
+	var req request.RegisterReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		tools.BadRequest(ctx, err.Error())
 		return
@@ -254,7 +255,7 @@ func (a *AuthApi) Register(ctx *gin.Context) {
 }
 
 func (a *AuthApi) SendEmail(ctx *gin.Context) {
-	var req model.SendVerificationCodeReq
+	var req request.SendVerificationCodeReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		tools.BadRequest(ctx, err.Error())
 		return
