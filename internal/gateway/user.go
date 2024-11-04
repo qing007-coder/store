@@ -2,11 +2,13 @@ package gateway
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"go-micro.dev/v4/metadata"
 	"store/internal/proto/user"
 	rsp "store/pkg/constant/response"
 	"store/pkg/errors"
+	"store/pkg/model"
 	"store/pkg/model/request"
 	"store/pkg/tools"
 )
@@ -180,7 +182,15 @@ func (u *UserApi) GetReceiverAddressReq(ctx *gin.Context) {
 		return
 	}
 
-	tools.StatusOK(ctx, nil, resp.GetMessage())
+	var list []model.ReceiverAddress
+	if err := json.Unmarshal(resp.Data, &list); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	tools.StatusOK(ctx, gin.H{
+		"list": list,
+	}, resp.GetMessage())
 }
 
 func (u *UserApi) AddFavourites(ctx *gin.Context) {
@@ -256,7 +266,15 @@ func (u *UserApi) GetFavouritesListReq(ctx *gin.Context) {
 		return
 	}
 
-	tools.StatusOK(ctx, nil, resp.GetMessage())
+	var list []model.Favourites
+	if err := json.Unmarshal(resp.Data, &list); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	tools.StatusOK(ctx, gin.H{
+		"list": list,
+	}, resp.GetMessage())
 }
 
 func (u *UserApi) AddFootprint(ctx *gin.Context) {
@@ -332,7 +350,15 @@ func (u *UserApi) GetFootprintList(ctx *gin.Context) {
 		return
 	}
 
-	tools.StatusOK(ctx, nil, resp.GetMessage())
+	var list []model.Footprint
+	if err := json.Unmarshal(resp.Data, &list); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	tools.StatusOK(ctx, gin.H{
+		"list": list,
+	}, resp.GetMessage())
 }
 
 func (u *UserApi) FollowMerchant(ctx *gin.Context) {
@@ -399,5 +425,13 @@ func (u *UserApi) GetFollowList(ctx *gin.Context) {
 		return
 	}
 
-	tools.StatusOK(ctx, nil, resp.GetMessage())
+	var users []model.User
+	if err := json.Unmarshal(resp.Data, &users); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	tools.StatusOK(ctx, gin.H{
+		"list": users,
+	}, resp.GetMessage())
 }
