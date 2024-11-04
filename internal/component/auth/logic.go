@@ -155,15 +155,15 @@ func (a *AuthApi) RegisterClient(ctx *gin.Context) {
 	}, "注册成功")
 }
 
-func (a *AuthApi) Login(ctx *gin.Context) {
-	var req request.LoginReq
+func (a *AuthApi) LoginByPassword(ctx *gin.Context) {
+	var req request.LoginByPasswordReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		tools.BadRequest(ctx, err.Error())
 		return
 	}
 
 	var user model.User
-	if err := a.db.Where("account = ?", req.Account).First(&user).Error; err != nil {
+	if err := a.db.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			tools.BadRequest(ctx, errors.RecordNotFound.Error())
 		} else {
@@ -180,6 +180,54 @@ func (a *AuthApi) Login(ctx *gin.Context) {
 			tools.BadRequest(ctx, errors.OtherError.Error())
 			return
 		}
+	}
+
+	accessToken, err := tools.CreateToken(user.ID, a.conf.JWT.AccessExpiry, []byte(a.conf.JWT.SecretKey))
+	if err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	refreshToken := uuid.New().String()
+	if err := a.storeToken(accessToken, refreshToken, user.ID); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	tools.StatusOK(ctx, model.Data{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		Expiry:       a.conf.JWT.AccessExpiry,
+		TokenType:    "Bearer",
+	}, "登录成功")
+}
+
+func (a *AuthApi) LoginByVerificationCode(ctx *gin.Context) {
+	var req request.LoginByVerificationCodeReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	var user model.User
+	if err := a.db.Where("email = ?", req.Email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			tools.BadRequest(ctx, errors.RecordNotFound.Error())
+		} else {
+			tools.BadRequest(ctx, errors.OtherError.Error())
+			return
+		}
+	}
+
+	code, err := a.rdb.Get(a.ctx, req.Email)
+	if err != nil {
+		tools.BadRequest(ctx, "验证码失效")
+		return
+	}
+
+	if code != req.VerificationCode {
+		tools.BadRequest(ctx, "验证码错误")
+		return
 	}
 
 	accessToken, err := tools.CreateToken(user.ID, a.conf.JWT.AccessExpiry, []byte(a.conf.JWT.SecretKey))

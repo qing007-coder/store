@@ -1,8 +1,13 @@
 package request
 
-type LoginReq struct {
-	Account  string `json:"account"`
+type LoginByPasswordReq struct {
+	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type LoginByVerificationCodeReq struct {
+	Email            string `json:"email"`
+	VerificationCode string `json:"verification_code"`
 }
 
 type RegisterReq struct {
