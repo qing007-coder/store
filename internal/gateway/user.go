@@ -11,6 +11,7 @@ import (
 	"store/pkg/model"
 	"store/pkg/model/request"
 	"store/pkg/tools"
+	"strconv"
 )
 
 type UserApi struct {
@@ -170,7 +171,21 @@ func (u *UserApi) UpdateReceiverAddress(ctx *gin.Context) {
 
 func (u *UserApi) GetReceiverAddress(ctx *gin.Context) {
 	c := metadata.Set(u.ctx, "Authorization", ctx.GetString("Authorization"))
-	resp, err := u.client.GetReceiverAddress(c, &user.GetReceiverAddressReq{})
+	req, err := strconv.Atoi(ctx.Query("req"))
+	if err != nil {
+		tools.BadRequest(ctx, "req error")
+		return
+	}
+	size, err := strconv.Atoi(ctx.Query("size"))
+	if err != nil {
+		tools.BadRequest(ctx, "size error")
+		return
+	}
+
+	resp, err := u.client.GetReceiverAddress(c, &user.GetReceiverAddressReq{
+		Req:  int32(req),
+		Size: int32(size),
+	})
 
 	if err != nil {
 		tools.BadRequest(ctx, err.Error())
@@ -189,7 +204,8 @@ func (u *UserApi) GetReceiverAddress(ctx *gin.Context) {
 	}
 
 	tools.StatusOK(ctx, gin.H{
-		"list": list,
+		"list":  list,
+		"total": resp.GetTotal(),
 	}, resp.GetMessage())
 }
 
@@ -246,10 +262,22 @@ func (u *UserApi) DeleteFavourites(ctx *gin.Context) {
 
 func (u *UserApi) GetFavouritesList(ctx *gin.Context) {
 	category := ctx.Query("category")
+	req, err := strconv.Atoi(ctx.Query("req"))
+	if err != nil {
+		tools.BadRequest(ctx, "req error")
+		return
+	}
+	size, err := strconv.Atoi(ctx.Query("size"))
+	if err != nil {
+		tools.BadRequest(ctx, "size error")
+		return
+	}
 
 	c := metadata.Set(u.ctx, "Authorization", ctx.GetString("Authorization"))
 	resp, err := u.client.GetFavouritesList(c, &user.GetFavouritesListReq{
 		Category: category,
+		Req:      int32(req),
+		Size:     int32(size),
 	})
 
 	if err != nil {
@@ -269,7 +297,8 @@ func (u *UserApi) GetFavouritesList(ctx *gin.Context) {
 	}
 
 	tools.StatusOK(ctx, gin.H{
-		"list": list,
+		"list":  list,
+		"total": resp.GetTotal(),
 	}, resp.GetMessage())
 }
 
@@ -326,10 +355,22 @@ func (u *UserApi) DeleteFootprint(ctx *gin.Context) {
 
 func (u *UserApi) GetFootprintList(ctx *gin.Context) {
 	category := ctx.Query("category")
+	req, err := strconv.Atoi(ctx.Query("req"))
+	if err != nil {
+		tools.BadRequest(ctx, "req error")
+		return
+	}
+	size, err := strconv.Atoi(ctx.Query("size"))
+	if err != nil {
+		tools.BadRequest(ctx, "size error")
+		return
+	}
 
 	c := metadata.Set(u.ctx, "Authorization", ctx.GetString("Authorization"))
 	resp, err := u.client.GetFootprintList(c, &user.GetFootprintListReq{
 		Category: category,
+		Req:      int32(req),
+		Size:     int32(size),
 	})
 
 	if err != nil {
@@ -349,7 +390,8 @@ func (u *UserApi) GetFootprintList(ctx *gin.Context) {
 	}
 
 	tools.StatusOK(ctx, gin.H{
-		"list": list,
+		"list":  list,
+		"total": resp.GetTotal(),
 	}, resp.GetMessage())
 }
 
@@ -404,8 +446,22 @@ func (u *UserApi) CancelFollow(ctx *gin.Context) {
 }
 
 func (u *UserApi) GetFollowList(ctx *gin.Context) {
+	req, err := strconv.Atoi(ctx.Query("req"))
+	if err != nil {
+		tools.BadRequest(ctx, "req error")
+		return
+	}
+	size, err := strconv.Atoi(ctx.Query("size"))
+	if err != nil {
+		tools.BadRequest(ctx, "size error")
+		return
+	}
+
 	c := metadata.Set(u.ctx, "Authorization", ctx.GetString("Authorization"))
-	resp, err := u.client.GetFollowList(c, &user.GetFollowListReq{})
+	resp, err := u.client.GetFollowList(c, &user.GetFollowListReq{
+		Req:  int32(req),
+		Size: int32(size),
+	})
 
 	if err != nil {
 		tools.BadRequest(ctx, err.Error())
@@ -424,6 +480,7 @@ func (u *UserApi) GetFollowList(ctx *gin.Context) {
 	}
 
 	tools.StatusOK(ctx, gin.H{
-		"list": users,
+		"list":  users,
+		"total": resp.GetTotal(),
 	}, resp.GetMessage())
 }
