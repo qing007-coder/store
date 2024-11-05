@@ -10,8 +10,6 @@ func CreateIndex(es map[string]*elasticsearch.Elasticsearch) error {
 	return nil
 }
 
-func DeleteIndex(es map[string]*elasticsearch.Elasticsearch) error {
-	for _, e := range es {
-		return
-	}
+func DeleteIndex(es *elasticsearch.Elasticsearch) error {
+	return es.DeleteIndex()
 }
