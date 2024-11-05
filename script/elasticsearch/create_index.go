@@ -1,10 +1,14 @@
 package elasticsearch
 
-import "store/pkg/elasticsearch"
+import (
+	"store/pkg/elasticsearch"
+)
 
 func CreateIndex(es map[string]*elasticsearch.Elasticsearch) error {
 	for _, e := range es {
-		return e.CreateIndex()
+		if err := e.CreateIndex(); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -12,7 +16,9 @@ func CreateIndex(es map[string]*elasticsearch.Elasticsearch) error {
 
 func DeleteIndex(es map[string]*elasticsearch.Elasticsearch) error {
 	for _, e := range es {
-		return e.DeleteIndex()
+		if err := e.DeleteIndex(); err != nil {
+			return err
+		}
 	}
 
 	return nil

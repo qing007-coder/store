@@ -1,5 +1,10 @@
 package main
 
+import (
+	"store/pkg/errors"
+	"store/script/mock"
+)
+
 func main() {
 	//conf := sarama.NewConfig()
 	//conf.Net.MaxOpenRequests = 2
@@ -61,4 +66,20 @@ func main() {
 	//data, err := rdb.Get(context.Background(), "1851894943077896192")
 	//fmt.Println(data)
 	//fmt.Println(err != nil)
+
+	srv, err := mock.NewServer()
+	if err != nil {
+		errors.HandleError(err)
+		return
+	}
+
+	//if err := srv.Run(); err != nil {
+	//	errors.HandleError(err)
+	//	return
+	//}
+
+	if err := srv.Clear(); err != nil {
+		errors.HandleError(err)
+		return
+	}
 }

@@ -50,5 +50,5 @@ func (s *Server) Clear() error {
 		return err
 	}
 
-	return s.db.Delete(&model.User{}).Error
+	return s.db.Unscoped().Where("1 = 1").Delete(&model.User{}).Error
 }
