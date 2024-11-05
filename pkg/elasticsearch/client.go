@@ -111,3 +111,8 @@ func (es *Elasticsearch) DeleteDocument(id string) error {
 	_, err := es.Client.Delete(es.Index, id).Do(es.Ctx)
 	return err
 }
+
+func (es *Elasticsearch) DeleteIndex() error {
+	_, err := es.Client.Indices.Delete(es.Index).Do(context.Background())
+	return err
+}
