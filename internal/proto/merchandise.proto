@@ -6,13 +6,13 @@ option go_package = "./internal/proto/merchandise";
 service MerchandiseService {
   rpc PutAwayMerchandise (stream PutAwayMerchandiseReq) returns (PutAwayMerchandiseResp);
   rpc RemoveMerchandise (RemoveMerchandiseReq) returns (RemoveMerchandiseResp);
-  rpc UpdateMerchandise (UpdateMerchandiseReq) returns (UpdateMerchandiseResp);
+  rpc UpdateMerchandise (stream UpdateMerchandiseReq) returns (UpdateMerchandiseResp);
   rpc GetMerchandiseDetails (GetMerchandiseDetailsReq) returns (GetMerchandiseDetailsResp);
   rpc Search (SearchReq) returns (SearchResp);
   rpc SearchByCategory (SearchByCategoryReq) returns (SearchByCategoryResp);
   rpc AddMerchandiseStyle (stream AddMerchandiseStyleReq) returns (AddMerchandiseStyleResp);
   rpc RemoveMerchandiseStyle (RemoveMerchandiseStyleReq) returns (RemoveMerchandiseStyleResp);
-  rpc UpdateMerchandiseStyle (UpdateMerchandiseStyleReq) returns (UpdateMerchandiseStyleResp);
+  rpc UpdateMerchandiseStyle (stream UpdateMerchandiseStyleReq) returns (UpdateMerchandiseStyleResp);
   rpc GetMerchandiseStyleList (GetMerchandiseStyleListReq) returns (GetMerchandiseStyleListResp);
   rpc GetMerchandiseStyleDetails (GetMerchandiseStyleDetailsReq) returns (GetMerchandiseStyleDetailsResp);
 }
@@ -50,7 +50,7 @@ message UpdateMerchandiseReq {
   string id = 1;
   string name = 2;
   string info = 3;
-  repeated string pictureList = 4;
+  Chunk chunk = 4;
   string delivery = 5;
   string category = 6;
 }
@@ -129,7 +129,7 @@ message UpdateMerchandiseStyleReq {
   string id = 1;
   string name = 2;
   string info = 3;
-  string picture = 4;
+  Chunk chunk = 4;
   float price = 5;
   int32 stock = 6;
   string status = 7;

@@ -116,8 +116,45 @@ func (m *MerchandiseStyle) RemoveMerchandiseStyle(ctx context.Context, req *merc
 	return nil
 }
 
-func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, req *merchandise.UpdateMerchandiseStyleReq, resp *merchandise.UpdateMerchandiseStyleResp) error {
+func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, stream merchandise.MerchandiseService_UpdateMerchandiseStyleStream) error {
 	uid := ctx.Value("user_id").(string)
+
+	var req *merchandise.UpdateMerchandiseStyleReq
+	var picture bytes.Buffer
+
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		req = &merchandise.UpdateMerchandiseStyleReq{
+			Id:     data.GetId(),
+			Name:   data.GetName(),
+			Info:   data.GetInfo(),
+			Price:  data.GetPrice(),
+			Stock:  data.GetStock(),
+			Status: data.GetStatus(),
+		}
+
+		chunk := data.GetChunk()
+		_, err = picture.Write(chunk.GetData())
+		if err != nil {
+			return err
+		}
+	}
+
+	if picture.Len() != 0 {
+		path := fmt.Sprintf("%s", req.GetId())
+		_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
+		if err != nil {
+			return err
+		}
+	}
 
 	var queries map[string]interface{}
 	if req.GetName() != "" {
@@ -126,10 +163,6 @@ func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, req *merc
 
 	if req.GetInfo() != "" {
 		queries["info"] = req.GetInfo()
-	}
-
-	if req.GetPicture() != "" {
-		queries["picture"] = req.GetPicture()
 	}
 
 	if req.GetPrice() != -1 {
@@ -162,10 +195,10 @@ func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, req *merc
 		Source: constant.MERCHANDISESTYLE,
 	})
 
-	resp.Code = rsp.OK
-	resp.Message = rsp.UPDATESUCCESS
-
-	return nil
+	return stream.SendMsg(&merchandise.UpdateMerchandiseStyleResp{
+		Code:    rsp.OK,
+		Message: rsp.UPDATESUCCESS,
+	})
 }
 
 func (m *MerchandiseStyle) GetMerchandiseStyleList(ctx context.Context, req *merchandise.GetMerchandiseStyleListReq, resp *merchandise.GetMerchandiseStyleListResp) error {

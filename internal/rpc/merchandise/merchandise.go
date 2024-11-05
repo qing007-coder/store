@@ -124,8 +124,52 @@ func (m *Merchandise) RemoveMerchandise(ctx context.Context, req *merchandise.Re
 	return nil
 }
 
-func (m *Merchandise) UpdateMerchandise(ctx context.Context, req *merchandise.UpdateMerchandiseReq, resp *merchandise.UpdateMerchandiseResp) error {
+func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.MerchandiseService_UpdateMerchandiseStream) error {
 	uid := ctx.Value("user_id").(string)
+
+	var req *merchandise.UpdateMerchandiseReq
+	pictures := make(map[string]*bytes.Buffer)
+
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		req = &merchandise.UpdateMerchandiseReq{
+			Id:       data.GetId(),
+			Name:     data.GetName(),
+			Info:     data.GetInfo(),
+			Delivery: data.GetDelivery(),
+			Category: data.GetCategory(),
+		}
+
+		chunk := data.GetChunk()
+		_, err = pictures[chunk.GetPictureID()].Write(chunk.GetData())
+		if err != nil {
+			return err
+		}
+	}
+
+	id := tools.CreateID()
+	var pictureList []string
+	for pictureID, data := range pictures {
+		path := fmt.Sprintf("%s/%s", id, pictureID)
+		pictureList = append(pictureList, path)
+
+		if data.Len() == 0 {
+			continue
+		}
+		_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
 	var queries map[string]interface{}
 
 	if req.GetName() != "" {
@@ -144,7 +188,7 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, req *merchandise.Up
 		queries["delivery"] = req.GetDelivery()
 	}
 
-	queries["picture_list"] = req.GetPictureList()
+	queries["picture_list"] = pictureList
 	queries["updated_at"] = time.Now().Unix()
 
 	if err := m.ES[constant.MERCHANDISE].Update(req.Id, queries); err != nil {
@@ -160,10 +204,10 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, req *merchandise.Up
 		Source: constant.MERCHANDISE,
 	})
 
-	resp.Code = rsp.OK
-	resp.Message = rsp.UPDATESUCCESS
-
-	return nil
+	return stream.SendMsg(&merchandise.UpdateMerchandiseResp{
+		Code:    rsp.OK,
+		Message: rsp.UPDATESUCCESS,
+	})
 }
 
 func (m *Merchandise) GetMerchandiseDetails(ctx context.Context, req *merchandise.GetMerchandiseDetailsReq, resp *merchandise.GetMerchandiseDetailsResp) error {
