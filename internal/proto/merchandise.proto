@@ -4,25 +4,30 @@ package merchandise_master;
 option go_package = "./internal/proto/merchandise";
 
 service MerchandiseService {
-  rpc PutAwayMerchandise (PutAwayMerchandiseReq) returns (PutAwayMerchandiseResp);
+  rpc PutAwayMerchandise (stream PutAwayMerchandiseReq) returns (PutAwayMerchandiseResp);
   rpc RemoveMerchandise (RemoveMerchandiseReq) returns (RemoveMerchandiseResp);
   rpc UpdateMerchandise (UpdateMerchandiseReq) returns (UpdateMerchandiseResp);
   rpc GetMerchandiseDetails (GetMerchandiseDetailsReq) returns (GetMerchandiseDetailsResp);
   rpc Search (SearchReq) returns (SearchResp);
   rpc SearchByCategory (SearchByCategoryReq) returns (SearchByCategoryResp);
-  rpc AddMerchandiseStyle (AddMerchandiseStyleReq) returns (AddMerchandiseStyleResp);
+  rpc AddMerchandiseStyle (stream AddMerchandiseStyleReq) returns (AddMerchandiseStyleResp);
   rpc RemoveMerchandiseStyle (RemoveMerchandiseStyleReq) returns (RemoveMerchandiseStyleResp);
   rpc UpdateMerchandiseStyle (UpdateMerchandiseStyleReq) returns (UpdateMerchandiseStyleResp);
   rpc GetMerchandiseStyleList (GetMerchandiseStyleListReq) returns (GetMerchandiseStyleListResp);
   rpc GetMerchandiseStyleDetails (GetMerchandiseStyleDetailsReq) returns (GetMerchandiseStyleDetailsResp);
 }
 
+message Chunk {
+  string pictureID = 1;
+  bytes data = 2;
+}
+
 message PutAwayMerchandiseReq {
   string name = 1;
   string info = 2;
-  repeated string pictureList = 3;
-  string delivery = 4;
-  string category = 5;
+  string delivery = 3;
+  string category = 4;
+  Chunk chunk = 5;
 }
 
 message PutAwayMerchandiseResp {
@@ -98,7 +103,7 @@ message AddMerchandiseStyleReq {
   string merchandiseID = 1;
   string name = 2;
   string info = 3;
-  string picture = 4;
+  Chunk chunk = 4;
   float price = 5;
   uint32 stock = 6;
   string status = 7;

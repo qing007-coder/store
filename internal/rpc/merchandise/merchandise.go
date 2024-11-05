@@ -1,10 +1,13 @@
 package merchandise
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/minio/minio-go/v7"
+	"io"
 	"store/internal/proto/merchandise"
 	"store/internal/rpc/base"
 	"store/pkg/constant"
@@ -28,15 +31,53 @@ func NewMerchandise(b *base.Base) *Merchandise {
 	}
 }
 
-func (m *Merchandise) PutAwayMerchandise(ctx context.Context, req *merchandise.PutAwayMerchandiseReq, resp *merchandise.PutAwayMerchandiseResp) error {
+func (m *Merchandise) PutAwayMerchandise(ctx context.Context, stream merchandise.MerchandiseService_PutAwayMerchandiseStream) error {
 	uid := ctx.Value("user_id").(string)
-	fmt.Println("uid:", uid)
+	var req *merchandise.PutAwayMerchandiseReq
+	pictures := make(map[string]*bytes.Buffer)
+
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		req = &merchandise.PutAwayMerchandiseReq{
+			Name:     data.GetName(),
+			Info:     data.GetInfo(),
+			Delivery: data.GetDelivery(),
+			Category: data.GetCategory(),
+		}
+
+		chunk := data.GetChunk()
+		_, err = pictures[chunk.GetPictureID()].Write(chunk.GetData())
+		if err != nil {
+			return err
+		}
+	}
+
 	id := tools.CreateID()
+	var pictureList []string
+
+	for pictureID, data := range pictures {
+		path := fmt.Sprintf("%s/%s", id, pictureID)
+		pictureList = append(pictureList, path)
+
+		_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
 	if err := m.ES[constant.MERCHANDISE].CreateDocument(&model.Merchandise{
 		ID:          id,
 		Name:        req.GetName(),
 		Info:        req.GetInfo(),
-		PictureList: req.GetPictureList(),
+		PictureList: pictureList,
 		MerchantID:  uid,
 		Delivery:    req.GetDelivery(),
 		Category:    req.GetCategory(),
@@ -56,10 +97,10 @@ func (m *Merchandise) PutAwayMerchandise(ctx context.Context, req *merchandise.P
 		Source: constant.MERCHANDISE,
 	})
 
-	resp.Code = rsp.OK
-	resp.Message = rsp.CREATESUCCESS
-
-	return nil
+	return stream.SendMsg(&merchandise.PutAwayMerchandiseResp{
+		Code:    rsp.OK,
+		Message: rsp.CREATESUCCESS,
+	})
 }
 
 func (m *Merchandise) RemoveMerchandise(ctx context.Context, req *merchandise.RemoveMerchandiseReq, resp *merchandise.RemoveMerchandiseResp) error {

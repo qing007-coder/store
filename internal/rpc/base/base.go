@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/IBM/sarama"
+	"github.com/minio/minio-go/v7"
 	"gorm.io/gorm"
 	"store/pkg/config"
 	"store/pkg/elasticsearch"
 	"store/pkg/kafka"
 	"store/pkg/logger"
+	mc "store/pkg/minio"
 	"store/pkg/mysql"
 	"store/pkg/redis"
 	"store/pkg/rules"
@@ -22,6 +24,7 @@ type Base struct {
 	Logger   *logger.Logger
 	Conf     *config.GlobalConfig
 	ES       map[string]*elasticsearch.Elasticsearch
+	MC       *minio.Client
 }
 
 func NewBase(index []string) (*Base, error) {
@@ -64,6 +67,11 @@ func NewBase(index []string) (*Base, error) {
 		es[i] = client
 	}
 
+	m, err := mc.NewClient(conf)
+	if err != nil {
+		return nil, err
+	}
+
 	l := logger.NewLogger(p)
 	return &Base{
 		Ctx:      ctx,
@@ -73,5 +81,6 @@ func NewBase(index []string) (*Base, error) {
 		Logger:   l,
 		Conf:     conf,
 		ES:       es,
+		MC:       m,
 	}, nil
 }

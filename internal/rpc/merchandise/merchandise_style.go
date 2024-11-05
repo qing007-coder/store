@@ -1,9 +1,13 @@
 package merchandise
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/minio/minio-go/v7"
+	"io"
 	"store/internal/proto/merchandise"
 	"store/internal/rpc/base"
 	"store/pkg/constant"
@@ -23,15 +27,51 @@ func NewMerchandiseStyle(b *base.Base) *MerchandiseStyle {
 	return &MerchandiseStyle{b}
 }
 
-func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, req *merchandise.AddMerchandiseStyleReq, resp *merchandise.AddMerchandiseStyleResp) error {
+func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, stream merchandise.MerchandiseService_AddMerchandiseStyleStream) error {
 	uid := ctx.Value("user_id").(string)
+
+	var req *merchandise.AddMerchandiseStyleReq
+	var picture bytes.Buffer
+
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		req = &merchandise.AddMerchandiseStyleReq{
+			MerchandiseID: data.GetMerchandiseID(),
+			Name:          data.GetName(),
+			Info:          data.GetInfo(),
+			Price:         data.GetPrice(),
+			Stock:         data.GetStock(),
+			Status:        data.GetStatus(),
+		}
+
+		chunk := data.GetChunk()
+		_, err = picture.Write(chunk.GetData())
+		if err != nil {
+			return err
+		}
+	}
+
 	id := tools.CreateID()
+	path := fmt.Sprintf("%s", id)
+	_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
+	if err != nil {
+		return err
+	}
+
 	if err := m.ES[constant.MERCHANDISESTYLE].CreateDocument(&model.MerchandiseStyle{
 		ID:            id,
 		MerchandiseID: req.GetMerchandiseID(),
 		Name:          req.GetName(),
 		Info:          req.GetInfo(),
-		Picture:       req.GetPicture(),
+		Picture:       path,
 		Price:         req.GetPrice(),
 		Stock:         req.GetStock(),
 		Status:        req.GetStatus(),
@@ -49,10 +89,10 @@ func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, req *merchan
 		Source: constant.MERCHANDISESTYLE,
 	})
 
-	resp.Code = rsp.OK
-	resp.Message = rsp.CREATESUCCESS
-
-	return nil
+	return stream.SendMsg(&merchandise.AddMerchandiseStyleResp{
+		Code:    rsp.OK,
+		Message: rsp.CREATESUCCESS,
+	})
 }
 
 func (m *MerchandiseStyle) RemoveMerchandiseStyle(ctx context.Context, req *merchandise.RemoveMerchandiseStyleReq, resp *merchandise.RemoveMerchandiseStyleResp) error {
