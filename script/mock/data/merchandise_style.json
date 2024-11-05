@@ -1,0 +1,122 @@
+[
+    {
+        "id": "style_001",
+        "merchandise_id": "1",
+        "name": "智能手表 - 黑色款",
+        "info": "时尚黑色设计，适合商务与日常穿搭。",
+        "picture": "/mock/img3",
+        "price": 199.99,
+        "stock": 100,
+        "status": "在售",
+        "created_at": 1660000000,
+        "updated_at": 1661000000
+    },
+    {
+        "id": "style_002",
+        "merchandise_id": "1",
+        "name": "智能手表 - 银色款",
+        "info": "优雅银色外观，充满现代感。",
+        "picture": "/mock/img3",
+        "price": 209.99,
+        "stock": 80,
+        "status": "在售",
+        "created_at": 1660005000,
+        "updated_at": 1661005000
+    },
+    {
+        "id": "style_003",
+        "merchandise_id": "2",
+        "name": "蓝牙耳机 - 黑色款",
+        "info": "简约黑色设计，音质优秀。",
+        "picture": "/mock/img3",
+        "price": 79.99,
+        "stock": 150,
+        "status": "在售",
+        "created_at": 1660500000,
+        "updated_at": 1661500000
+    },
+    {
+        "id": "style_004",
+        "merchandise_id": "2",
+        "name": "蓝牙耳机 - 白色款",
+        "info": "白色款，清新亮丽。",
+        "picture": "/mock/img3",
+        "price": 85.99,
+        "stock": 120,
+        "status": "在售",
+        "created_at": 1660501000,
+        "updated_at": 1661501000
+    },
+    {
+        "id": "style_005",
+        "merchandise_id": "3",
+        "name": "运动鞋 - 蓝色款",
+        "info": "透气轻盈，适合日常运动。",
+        "picture": "/mock/img3",
+        "price": 120.00,
+        "stock": 60,
+        "status": "在售",
+        "created_at": 1661000000,
+        "updated_at": 1662000000
+    },
+    {
+        "id": "style_006",
+        "merchandise_id": "3",
+        "name": "运动鞋 - 红色款",
+        "info": "醒目红色，彰显个性。",
+        "picture": "/mock/img3",
+        "price": 125.00,
+        "stock": 50,
+        "status": "在售",
+        "created_at": 1661005000,
+        "updated_at": 1662005000
+    },
+    {
+        "id": "style_007",
+        "merchandise_id": "4",
+        "name": "旅行背包 - 大容量款",
+        "info": "大容量设计，适合短途旅行。",
+        "picture": "/mock/img3",
+        "price": 55.00,
+        "stock": 90,
+        "status": "在售",
+        "created_at": 1661500000,
+        "updated_at": 1662500000
+    },
+    {
+        "id": "style_008",
+        "merchandise_id": "5",
+        "name": "健身器材 - 哑铃套装",
+        "info": "多重量选择，适合家庭使用。",
+        "picture": "/mock/img3",
+        "price": 75.00,
+        "stock": 40,
+        "status": "在售",
+        "created_at": 1662000000,
+        "updated_at": 1663000000
+    },
+    {
+        "id": "style_009",
+        "merchandise_id": "6",
+        "name": "护肤霜 - 保湿款",
+        "info": "深层保湿，适合干性肌肤。",
+        "picture": "/mock/img3",
+        "price": 35.00,
+        "stock": 200,
+        "status": "在售",
+        "created_at": 1662500000,
+        "updated_at": 1663500000
+    },
+    {
+        "id": "style_010",
+        "merchandise_id": "7",
+        "name": "无线吸尘器 - 静音款",
+        "info": "低噪音设计，适合家庭使用。",
+        "picture": "/mock/img3",
+        "price": 150.00,
+        "stock": 30,
+        "status": "在售",
+        "created_at": 1663000000,
+        "updated_at": 1664000000
+    }
+]
