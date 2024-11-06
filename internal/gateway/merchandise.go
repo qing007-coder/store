@@ -237,7 +237,20 @@ func (m *MerchandiseApi) SearchByCategory(ctx *gin.Context) {
 }
 
 func (m *MerchandiseApi) AddMerchandiseStyle(ctx *gin.Context) {
+	merchandiseID := ctx.PostForm("merchandise_id")
+	name := ctx.PostForm("name")
+	info := ctx.PostForm("info")
+	price := ctx.PostForm("price")
+	stock := ctx.PostForm("stock")
+	status := ctx.PostForm("status")
 
+	file, err := ctx.FormFile("picture")
+	if err != nil {
+		tools.BadRequest(ctx, err.Error())
+		return
+	}
+
+	f, _ := file.Open()
 }
 
 func (m *MerchandiseApi) RemoveMerchandiseStyle(ctx *gin.Context) {
