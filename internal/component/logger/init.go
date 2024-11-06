@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/IBM/sarama"
 	"log"
-	"store/pkg/constant"
+	"store/pkg/constant/rules"
 	"store/pkg/elasticsearch"
 	"store/pkg/kafka"
 	"store/pkg/model"
@@ -28,7 +28,7 @@ func NewLogConsumer(es *elasticsearch.Elasticsearch, c *kafka.Consumer) *LogCons
 }
 
 func (l *LogConsumer) Run() error {
-	return l.consumer.Subscribe(constant.LOGTOPIC, 0, sarama.OffsetNewest)
+	return l.consumer.Subscribe(rules.LOGTOPIC, 0, sarama.OffsetNewest)
 }
 
 func (l *LogConsumer) HandleLog(message *sarama.ConsumerMessage) {

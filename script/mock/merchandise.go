@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"os"
-	"store/pkg/constant"
+	"store/pkg/constant/store"
 	"store/pkg/model"
 )
 
@@ -35,7 +35,7 @@ func (m *Merchandise) CreateMerchandiseMock() error {
 	}
 
 	for _, merchandise := range ms {
-		if err := m.es[constant.MERCHANDISE].CreateDocument(&merchandise, merchandise.ID); err != nil {
+		if err := m.es[store.MERCHANDISE].CreateDocument(&merchandise, merchandise.ID); err != nil {
 			return err
 		}
 	}

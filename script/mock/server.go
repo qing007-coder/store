@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"store/pkg/constant"
+	"store/pkg/constant/store"
 	"store/pkg/model"
 	"store/script/elasticsearch"
 )
@@ -14,7 +14,7 @@ type Server struct {
 }
 
 func NewServer() (*Server, error) {
-	b, err := NewBase([]string{constant.MERCHANDISE, constant.MERCHANDISESTYLE})
+	b, err := NewBase([]string{store.MERCHANDISE, store.MERCHANDISESTYLE})
 	if err != nil {
 		return nil, err
 	}

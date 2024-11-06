@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"store/pkg/errors"
-	"store/script/mock"
 )
 
 func main() {
@@ -67,19 +68,32 @@ func main() {
 	//fmt.Println(data)
 	//fmt.Println(err != nil)
 
-	srv, err := mock.NewServer()
-	if err != nil {
-		errors.HandleError(err)
-		return
-	}
+	//srv, err := mock.NewServer()
+	//if err != nil {
+	//	errors.HandleError(err)
+	//	return
+	//}
 
 	//if err := srv.Run(); err != nil {
 	//	errors.HandleError(err)
 	//	return
 	//}
 
-	if err := srv.Clear(); err != nil {
-		errors.HandleError(err)
-		return
-	}
+	//if err := srv.Clear(); err != nil {
+	//	errors.HandleError(err)
+	//	return
+	//}
+
+	r := gin.Default()
+	r.POST("", func(ctx *gin.Context) {
+		form, err := ctx.MultipartForm()
+		if err != nil {
+			errors.HandleError(err)
+			return
+		}
+
+		fmt.Println(form.File["f"])
+	})
+
+	r.Run(":8080")
 }
