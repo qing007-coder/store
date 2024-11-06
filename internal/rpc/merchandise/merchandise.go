@@ -10,9 +10,10 @@ import (
 	"io"
 	"store/internal/proto/merchandise"
 	"store/internal/rpc/base"
-	"store/pkg/constant"
 	"store/pkg/constant/resource"
 	rsp "store/pkg/constant/response"
+	"store/pkg/constant/rules"
+	"store/pkg/constant/store"
 	"store/pkg/errors"
 	"store/pkg/model"
 	"store/pkg/tools"
@@ -67,13 +68,13 @@ func (m *Merchandise) PutAwayMerchandise(ctx context.Context, stream merchandise
 		path := fmt.Sprintf("%s/%s", id, pictureID)
 		pictureList = append(pictureList, path)
 
-		_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
+		_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
 		if err != nil {
 			return err
 		}
 	}
 
-	if err := m.ES[constant.MERCHANDISE].CreateDocument(&model.Merchandise{
+	if err := m.ES[store.MERCHANDISE].CreateDocument(&model.Merchandise{
 		ID:          id,
 		Name:        req.GetName(),
 		Info:        req.GetInfo(),
@@ -93,8 +94,8 @@ func (m *Merchandise) PutAwayMerchandise(ctx context.Context, stream merchandise
 		ID:     tools.CreateID(),
 		Time:   time.Now(),
 		UserID: uid,
-		Action: constant.ADD,
-		Source: constant.MERCHANDISE,
+		Action: rules.ADD,
+		Source: store.MERCHANDISE,
 	})
 
 	return stream.SendMsg(&merchandise.PutAwayMerchandiseResp{
@@ -105,7 +106,7 @@ func (m *Merchandise) PutAwayMerchandise(ctx context.Context, stream merchandise
 
 func (m *Merchandise) RemoveMerchandise(ctx context.Context, req *merchandise.RemoveMerchandiseReq, resp *merchandise.RemoveMerchandiseResp) error {
 	uid := ctx.Value("user_id").(string)
-	if err := m.ES[constant.MERCHANDISE].DeleteDocument(req.Id); err != nil {
+	if err := m.ES[store.MERCHANDISE].DeleteDocument(req.Id); err != nil {
 		m.Logger.Error(errors.EsDeleteError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
@@ -114,8 +115,8 @@ func (m *Merchandise) RemoveMerchandise(ctx context.Context, req *merchandise.Re
 		ID:     tools.CreateID(),
 		Time:   time.Now(),
 		UserID: uid,
-		Action: constant.DELETE,
-		Source: constant.MERCHANDISE,
+		Action: rules.DELETE,
+		Source: store.MERCHANDISE,
 	})
 
 	resp.Code = rsp.OK
@@ -164,7 +165,7 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.
 		if data.Len() == 0 {
 			continue
 		}
-		_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
+		_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
 		if err != nil {
 			return err
 		}
@@ -191,7 +192,7 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.
 	queries["picture_list"] = pictureList
 	queries["updated_at"] = time.Now().Unix()
 
-	if err := m.ES[constant.MERCHANDISE].Update(req.Id, queries); err != nil {
+	if err := m.ES[store.MERCHANDISE].Update(req.Id, queries); err != nil {
 		m.Logger.Error(errors.EsUpdateError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
@@ -200,8 +201,8 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.
 		ID:     tools.CreateID(),
 		Time:   time.Now(),
 		UserID: uid,
-		Action: constant.UPDATE,
-		Source: constant.MERCHANDISE,
+		Action: rules.UPDATE,
+		Source: store.MERCHANDISE,
 	})
 
 	return stream.SendMsg(&merchandise.UpdateMerchandiseResp{
@@ -211,7 +212,7 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.
 }
 
 func (m *Merchandise) GetMerchandiseDetails(ctx context.Context, req *merchandise.GetMerchandiseDetailsReq, resp *merchandise.GetMerchandiseDetailsResp) error {
-	data, err := m.ES[constant.MERCHANDISE].GetDocumentByID(req.GetId())
+	data, err := m.ES[store.MERCHANDISE].GetDocumentByID(req.GetId())
 	if err != nil {
 		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err
@@ -282,7 +283,7 @@ func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, re
 		},
 	}
 
-	response, err := m.ES[constant.MERCHANDISE].Search(nil, shouldQueries, sort, int(req.Req*req.Size), int(req.Size))
+	response, err := m.ES[store.MERCHANDISE].Search(nil, shouldQueries, sort, int(req.Req*req.Size), int(req.Size))
 	if err != nil {
 		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err
@@ -351,7 +352,7 @@ func (m *Merchandise) SearchByCategory(ctx context.Context, req *merchandise.Sea
 		},
 	}
 
-	response, err := m.ES[constant.MERCHANDISE].Search(queries, nil, sort, int(req.Req*req.Size), int(req.Size))
+	response, err := m.ES[store.MERCHANDISE].Search(queries, nil, sort, int(req.Req*req.Size), int(req.Size))
 	if err != nil {
 		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err

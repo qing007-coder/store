@@ -10,9 +10,10 @@ import (
 	"io"
 	"store/internal/proto/merchandise"
 	"store/internal/rpc/base"
-	"store/pkg/constant"
 	"store/pkg/constant/resource"
 	rsp "store/pkg/constant/response"
+	"store/pkg/constant/rules"
+	"store/pkg/constant/store"
 	"store/pkg/errors"
 	"store/pkg/model"
 	"store/pkg/tools"
@@ -61,12 +62,12 @@ func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, stream merch
 
 	id := tools.CreateID()
 	path := fmt.Sprintf("%s", id)
-	_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
+	_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
 	if err != nil {
 		return err
 	}
 
-	if err := m.ES[constant.MERCHANDISESTYLE].CreateDocument(&model.MerchandiseStyle{
+	if err := m.ES[store.MERCHANDISESTYLE].CreateDocument(&model.MerchandiseStyle{
 		ID:            id,
 		MerchandiseID: req.GetMerchandiseID(),
 		Name:          req.GetName(),
@@ -85,8 +86,8 @@ func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, stream merch
 		ID:     tools.CreateID(),
 		Time:   time.Now(),
 		UserID: uid,
-		Action: constant.ADD,
-		Source: constant.MERCHANDISESTYLE,
+		Action: rules.ADD,
+		Source: store.MERCHANDISESTYLE,
 	})
 
 	return stream.SendMsg(&merchandise.AddMerchandiseStyleResp{
@@ -97,7 +98,7 @@ func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, stream merch
 
 func (m *MerchandiseStyle) RemoveMerchandiseStyle(ctx context.Context, req *merchandise.RemoveMerchandiseStyleReq, resp *merchandise.RemoveMerchandiseStyleResp) error {
 	uid := ctx.Value("user_id").(string)
-	if err := m.ES[constant.MERCHANDISESTYLE].DeleteDocument(req.GetId()); err != nil {
+	if err := m.ES[store.MERCHANDISESTYLE].DeleteDocument(req.GetId()); err != nil {
 		m.Logger.Error(errors.EsDeleteError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
@@ -106,8 +107,8 @@ func (m *MerchandiseStyle) RemoveMerchandiseStyle(ctx context.Context, req *merc
 		ID:     tools.CreateID(),
 		Time:   time.Now(),
 		UserID: uid,
-		Action: constant.DELETE,
-		Source: constant.MERCHANDISESTYLE,
+		Action: rules.DELETE,
+		Source: store.MERCHANDISESTYLE,
 	})
 
 	resp.Code = rsp.OK
@@ -150,7 +151,7 @@ func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, stream me
 
 	if picture.Len() != 0 {
 		path := fmt.Sprintf("%s", req.GetId())
-		_, err := m.MC.PutObject(m.Ctx, constant.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
+		_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
 		if err != nil {
 			return err
 		}
@@ -182,7 +183,7 @@ func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, stream me
 
 	queries["updated_at"] = time.Now().Unix()
 
-	if err := m.ES[constant.MERCHANDISESTYLE].Update(req.GetId(), queries); err != nil {
+	if err := m.ES[store.MERCHANDISESTYLE].Update(req.GetId(), queries); err != nil {
 		m.Logger.Error(errors.EsUpdateError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
@@ -191,8 +192,8 @@ func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, stream me
 		ID:     tools.CreateID(),
 		Time:   time.Now(),
 		UserID: uid,
-		Action: constant.UPDATE,
-		Source: constant.MERCHANDISESTYLE,
+		Action: rules.UPDATE,
+		Source: store.MERCHANDISESTYLE,
 	})
 
 	return stream.SendMsg(&merchandise.UpdateMerchandiseStyleResp{
@@ -209,7 +210,7 @@ func (m *MerchandiseStyle) GetMerchandiseStyleList(ctx context.Context, req *mer
 			},
 		},
 	}
-	response, err := m.ES[constant.MERCHANDISESTYLE].Search(must, nil, nil, int(req.GetReq()*req.GetSize()), int(req.GetSize()))
+	response, err := m.ES[store.MERCHANDISESTYLE].Search(must, nil, nil, int(req.GetReq()*req.GetSize()), int(req.GetSize()))
 	if err != nil {
 		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err
@@ -240,7 +241,7 @@ func (m *MerchandiseStyle) GetMerchandiseStyleList(ctx context.Context, req *mer
 }
 
 func (m *MerchandiseStyle) GetMerchandiseStyleDetails(ctx context.Context, req *merchandise.GetMerchandiseStyleDetailsReq, resp *merchandise.GetMerchandiseStyleDetailsResp) error {
-	data, err := m.ES[constant.MERCHANDISESTYLE].GetDocumentByID(req.GetId())
+	data, err := m.ES[store.MERCHANDISESTYLE].GetDocumentByID(req.GetId())
 	if err != nil {
 		m.Logger.Error(errors.EsSearchError.Error(), resource.MERCHANDISEMODULE)
 		return err
