@@ -1,3 +1,3 @@
-package constant
+package rules
 
 const LOGTOPIC = "log"

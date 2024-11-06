@@ -5,7 +5,7 @@ import (
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"store/pkg/constant"
+	"store/pkg/constant/rules"
 	"store/pkg/kafka"
 	"store/pkg/tools"
 	"time"
@@ -37,7 +37,7 @@ func (l *Logger) init() {
 func (l *Logger) Write(data []byte) (n int, err error) {
 	fmt.Println(string(data))
 	l.producer.Publish(&sarama.ProducerMessage{
-		Topic:  constant.LOGTOPIC,
+		Topic:  rules.LOGTOPIC,
 		Offset: 0,
 		Key:    sarama.StringEncoder("log"),
 		Value:  sarama.ByteEncoder(data),

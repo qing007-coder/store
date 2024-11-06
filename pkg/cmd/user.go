@@ -5,12 +5,12 @@ import (
 	"store/internal/rpc/middleware"
 	"store/internal/rpc/user"
 	"store/pkg/config"
-	"store/pkg/constant"
+	"store/pkg/constant/store"
 	"store/pkg/errors"
 )
 
 func NewUserServer() {
-	b, err := base.NewBase([]string{constant.MERCHANDISE, constant.MERCHANDISESTYLE, constant.MERCHANT})
+	b, err := base.NewBase([]string{store.MERCHANDISE, store.MERCHANDISESTYLE, store.MERCHANT})
 	if err != nil {
 		errors.HandleError(err)
 		return

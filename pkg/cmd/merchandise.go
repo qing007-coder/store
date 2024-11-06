@@ -5,12 +5,12 @@ import (
 	"store/internal/rpc/merchandise"
 	"store/internal/rpc/middleware"
 	"store/pkg/config"
-	"store/pkg/constant"
+	"store/pkg/constant/store"
 	"store/pkg/errors"
 )
 
 func NewMerchandiseServer() {
-	b, err := base.NewBase([]string{constant.MERCHANDISE, constant.MERCHANDISESTYLE})
+	b, err := base.NewBase([]string{store.MERCHANDISE, store.MERCHANDISESTYLE})
 	if err != nil {
 		errors.HandleError(err)
 		return

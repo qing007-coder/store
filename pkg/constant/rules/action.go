@@ -1,4 +1,4 @@
-package constant
+package rules
 
 const ADD = "add"
 const UPDATE = "update"

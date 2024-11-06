@@ -1,4 +1,4 @@
-package constant
+package rules
 
 const ADMINISTRATOR = "administrator"
 
