@@ -86,3 +86,9 @@ type MerchantRecord struct {
 	Action string    `json:"action"`
 	Source string    `json:"source"`
 }
+
+type ShoppingCart struct {
+	gorm.Model
+	MerchandiseID string `json:"merchandise_id"`
+	UserID        string `json:"user_id"`
+}

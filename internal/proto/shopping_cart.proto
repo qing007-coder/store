@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package shopping_cart_master;
+option go_package = "./internal/proto/shopping_cart";
+
+service ShoppingCartService {
+  rpc AddShoppingCart (AddShoppingCartReq) returns (ShoppingCartResp);
+  rpc RemoveShoppingCart (RemoveShoppingCartReq) returns (ShoppingCartResp);
+  rpc GetShoppingCartList (GetShoppingCartListReq) returns (ShoppingCartResp);
+}
+
+message AddShoppingCartReq {
+  string merchandiseID = 1;
+}
+
+message RemoveShoppingCartReq {
+  string merchandiseID = 1;
+  string userID =2;
+}
+
+message GetShoppingCartListReq {
+  string userID = 1;
+}
+
+message ShoppingCartResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
+}
