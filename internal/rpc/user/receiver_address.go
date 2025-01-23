@@ -73,7 +73,7 @@ func (r *ReceiverAddress) GetReceiverAddress(ctx context.Context, req *user.GetR
 
 	var count int64
 	var addresses []model.ReceiverAddress
-	r.DB.Where("user_id = ?", uid).Count(&count).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&addresses)
+	r.DB.Where("user_id = ?", uid).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&addresses).Count(&count)
 
 	data, err := json.Marshal(&addresses)
 	if err != nil {

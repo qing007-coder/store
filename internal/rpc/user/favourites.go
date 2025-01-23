@@ -56,7 +56,8 @@ func (r *Favourites) GetFavouritesList(ctx context.Context, req *user.GetFavouri
 
 	var count int64
 	var favourites []model.Favourites
-	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Count(&count).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&favourites).Error; err != nil {
+
+	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&favourites).Count(&count).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}

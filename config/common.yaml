@@ -31,10 +31,10 @@ email:
   host: "smtp.qq.com"
   port: 587
 minio:
-  endPoint: "127.0.0.1"
+  endPoint: "10.3.0.42"
   port: "9000"
-  accessKey: ""
-  secretKey: ""
+  accessKey: "pSEpJE3Fz5OOcJAJTbJF"
+  secretKey: "R4569RpFC0E1adcLWP4tJL20t5GZBEOiolMON4oL"
 jwt:
   secretKey: "qingqing"
   accessExpiry: 1

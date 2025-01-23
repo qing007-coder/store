@@ -1,13 +1,9 @@
 package merchandise
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
-	"github.com/minio/minio-go/v7"
-	"io"
 	"store/internal/proto/merchandise"
 	"store/internal/rpc/base"
 	"store/pkg/constant/resource"
@@ -28,51 +24,17 @@ func NewMerchandiseStyle(b *base.Base) *MerchandiseStyle {
 	return &MerchandiseStyle{b}
 }
 
-func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, stream merchandise.MerchandiseService_AddMerchandiseStyleStream) error {
+func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, req *merchandise.AddMerchandiseStyleReq, resp *merchandise.AddMerchandiseStyleResp) error {
 	uid := ctx.Value("user_id").(string)
 
-	var req *merchandise.AddMerchandiseStyleReq
-	var picture bytes.Buffer
-
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		req = &merchandise.AddMerchandiseStyleReq{
-			MerchandiseID: data.GetMerchandiseID(),
-			Name:          data.GetName(),
-			Info:          data.GetInfo(),
-			Price:         data.GetPrice(),
-			Stock:         data.GetStock(),
-			Status:        data.GetStatus(),
-		}
-
-		chunk := data.GetChunk()
-		_, err = picture.Write(chunk.GetData())
-		if err != nil {
-			return err
-		}
-	}
-
 	id := tools.CreateID()
-	path := fmt.Sprintf("%s", id)
-	_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
-	if err != nil {
-		return err
-	}
 
 	if err := m.ES[store.MERCHANDISESTYLE].CreateDocument(&model.MerchandiseStyle{
 		ID:            id,
 		MerchandiseID: req.GetMerchandiseID(),
 		Name:          req.GetName(),
 		Info:          req.GetInfo(),
-		Picture:       path,
+		Picture:       req.GetPicture(),
 		Price:         req.GetPrice(),
 		Stock:         req.GetStock(),
 		Status:        req.GetStatus(),
@@ -90,10 +52,10 @@ func (m *MerchandiseStyle) AddMerchandiseStyle(ctx context.Context, stream merch
 		Source: store.MERCHANDISESTYLE,
 	})
 
-	return stream.SendMsg(&merchandise.AddMerchandiseStyleResp{
-		Code:    rsp.OK,
-		Message: rsp.CREATESUCCESS,
-	})
+	resp.Code = rsp.OK
+	resp.Message = rsp.CREATESUCCESS
+
+	return nil
 }
 
 func (m *MerchandiseStyle) RemoveMerchandiseStyle(ctx context.Context, req *merchandise.RemoveMerchandiseStyleReq, resp *merchandise.RemoveMerchandiseStyleResp) error {
@@ -112,52 +74,15 @@ func (m *MerchandiseStyle) RemoveMerchandiseStyle(ctx context.Context, req *merc
 	})
 
 	resp.Code = rsp.OK
-	resp.Message = rsp.CREATESUCCESS
+	resp.Message = rsp.DELETESUCCESS
 
 	return nil
 }
 
-func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, stream merchandise.MerchandiseService_UpdateMerchandiseStyleStream) error {
+func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, req *merchandise.UpdateMerchandiseStyleReq, resp *merchandise.UpdateMerchandiseStyleResp) error {
 	uid := ctx.Value("user_id").(string)
 
-	var req *merchandise.UpdateMerchandiseStyleReq
-	var picture bytes.Buffer
-
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		req = &merchandise.UpdateMerchandiseStyleReq{
-			Id:     data.GetId(),
-			Name:   data.GetName(),
-			Info:   data.GetInfo(),
-			Price:  data.GetPrice(),
-			Stock:  data.GetStock(),
-			Status: data.GetStatus(),
-		}
-
-		chunk := data.GetChunk()
-		_, err = picture.Write(chunk.GetData())
-		if err != nil {
-			return err
-		}
-	}
-
-	if picture.Len() != 0 {
-		path := fmt.Sprintf("%s", req.GetId())
-		_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISESTYLE, path, &picture, int64(picture.Len()), minio.PutObjectOptions{})
-		if err != nil {
-			return err
-		}
-	}
-
-	var queries map[string]interface{}
+	queries := make(map[string]interface{})
 	if req.GetName() != "" {
 		queries["name"] = req.GetName()
 	}
@@ -196,10 +121,10 @@ func (m *MerchandiseStyle) UpdateMerchandiseStyle(ctx context.Context, stream me
 		Source: store.MERCHANDISESTYLE,
 	})
 
-	return stream.SendMsg(&merchandise.UpdateMerchandiseStyleResp{
-		Code:    rsp.OK,
-		Message: rsp.UPDATESUCCESS,
-	})
+	resp.Code = rsp.OK
+	resp.Message = rsp.UPDATESUCCESS
+
+	return nil
 }
 
 func (m *MerchandiseStyle) GetMerchandiseStyleList(ctx context.Context, req *merchandise.GetMerchandiseStyleListReq, resp *merchandise.GetMerchandiseStyleListResp) error {

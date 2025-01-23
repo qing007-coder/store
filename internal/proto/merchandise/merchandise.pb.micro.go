@@ -36,17 +36,18 @@ func NewMerchandiseServiceEndpoints() []*api.Endpoint {
 // Client API for MerchandiseService service
 
 type MerchandiseService interface {
-	PutAwayMerchandise(ctx context.Context, opts ...client.CallOption) (MerchandiseService_PutAwayMerchandiseService, error)
+	PutAwayMerchandise(ctx context.Context, in *PutAwayMerchandiseReq, opts ...client.CallOption) (*PutAwayMerchandiseResp, error)
 	RemoveMerchandise(ctx context.Context, in *RemoveMerchandiseReq, opts ...client.CallOption) (*RemoveMerchandiseResp, error)
-	UpdateMerchandise(ctx context.Context, opts ...client.CallOption) (MerchandiseService_UpdateMerchandiseService, error)
+	UpdateMerchandise(ctx context.Context, in *UpdateMerchandiseReq, opts ...client.CallOption) (*UpdateMerchandiseResp, error)
 	GetMerchandiseDetails(ctx context.Context, in *GetMerchandiseDetailsReq, opts ...client.CallOption) (*GetMerchandiseDetailsResp, error)
 	Search(ctx context.Context, in *SearchReq, opts ...client.CallOption) (*SearchResp, error)
 	SearchByCategory(ctx context.Context, in *SearchByCategoryReq, opts ...client.CallOption) (*SearchByCategoryResp, error)
-	AddMerchandiseStyle(ctx context.Context, opts ...client.CallOption) (MerchandiseService_AddMerchandiseStyleService, error)
+	AddMerchandiseStyle(ctx context.Context, in *AddMerchandiseStyleReq, opts ...client.CallOption) (*AddMerchandiseStyleResp, error)
 	RemoveMerchandiseStyle(ctx context.Context, in *RemoveMerchandiseStyleReq, opts ...client.CallOption) (*RemoveMerchandiseStyleResp, error)
-	UpdateMerchandiseStyle(ctx context.Context, opts ...client.CallOption) (MerchandiseService_UpdateMerchandiseStyleService, error)
+	UpdateMerchandiseStyle(ctx context.Context, in *UpdateMerchandiseStyleReq, opts ...client.CallOption) (*UpdateMerchandiseStyleResp, error)
 	GetMerchandiseStyleList(ctx context.Context, in *GetMerchandiseStyleListReq, opts ...client.CallOption) (*GetMerchandiseStyleListResp, error)
 	GetMerchandiseStyleDetails(ctx context.Context, in *GetMerchandiseStyleDetailsReq, opts ...client.CallOption) (*GetMerchandiseStyleDetailsResp, error)
+	HandlePicture(ctx context.Context, opts ...client.CallOption) (MerchandiseService_HandlePictureService, error)
 }
 
 type merchandiseService struct {
@@ -61,50 +62,14 @@ func NewMerchandiseService(name string, c client.Client) MerchandiseService {
 	}
 }
 
-func (c *merchandiseService) PutAwayMerchandise(ctx context.Context, opts ...client.CallOption) (MerchandiseService_PutAwayMerchandiseService, error) {
-	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/PutAwayMerchandise", &PutAwayMerchandiseReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *merchandiseService) PutAwayMerchandise(ctx context.Context, in *PutAwayMerchandiseReq, opts ...client.CallOption) (*PutAwayMerchandiseResp, error) {
+	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/PutAwayMerchandise", in)
+	out := new(PutAwayMerchandiseResp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &merchandiseServicePutAwayMerchandise{stream}, nil
-}
-
-type MerchandiseService_PutAwayMerchandiseService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	CloseSend() error
-	Close() error
-	Send(*PutAwayMerchandiseReq) error
-}
-
-type merchandiseServicePutAwayMerchandise struct {
-	stream client.Stream
-}
-
-func (x *merchandiseServicePutAwayMerchandise) CloseSend() error {
-	return x.stream.CloseSend()
-}
-
-func (x *merchandiseServicePutAwayMerchandise) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServicePutAwayMerchandise) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServicePutAwayMerchandise) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServicePutAwayMerchandise) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServicePutAwayMerchandise) Send(m *PutAwayMerchandiseReq) error {
-	return x.stream.Send(m)
+	return out, nil
 }
 
 func (c *merchandiseService) RemoveMerchandise(ctx context.Context, in *RemoveMerchandiseReq, opts ...client.CallOption) (*RemoveMerchandiseResp, error) {
@@ -117,50 +82,14 @@ func (c *merchandiseService) RemoveMerchandise(ctx context.Context, in *RemoveMe
 	return out, nil
 }
 
-func (c *merchandiseService) UpdateMerchandise(ctx context.Context, opts ...client.CallOption) (MerchandiseService_UpdateMerchandiseService, error) {
-	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/UpdateMerchandise", &UpdateMerchandiseReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *merchandiseService) UpdateMerchandise(ctx context.Context, in *UpdateMerchandiseReq, opts ...client.CallOption) (*UpdateMerchandiseResp, error) {
+	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/UpdateMerchandise", in)
+	out := new(UpdateMerchandiseResp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &merchandiseServiceUpdateMerchandise{stream}, nil
-}
-
-type MerchandiseService_UpdateMerchandiseService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	CloseSend() error
-	Close() error
-	Send(*UpdateMerchandiseReq) error
-}
-
-type merchandiseServiceUpdateMerchandise struct {
-	stream client.Stream
-}
-
-func (x *merchandiseServiceUpdateMerchandise) CloseSend() error {
-	return x.stream.CloseSend()
-}
-
-func (x *merchandiseServiceUpdateMerchandise) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServiceUpdateMerchandise) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServiceUpdateMerchandise) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandise) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandise) Send(m *UpdateMerchandiseReq) error {
-	return x.stream.Send(m)
+	return out, nil
 }
 
 func (c *merchandiseService) GetMerchandiseDetails(ctx context.Context, in *GetMerchandiseDetailsReq, opts ...client.CallOption) (*GetMerchandiseDetailsResp, error) {
@@ -193,50 +122,14 @@ func (c *merchandiseService) SearchByCategory(ctx context.Context, in *SearchByC
 	return out, nil
 }
 
-func (c *merchandiseService) AddMerchandiseStyle(ctx context.Context, opts ...client.CallOption) (MerchandiseService_AddMerchandiseStyleService, error) {
-	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/AddMerchandiseStyle", &AddMerchandiseStyleReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *merchandiseService) AddMerchandiseStyle(ctx context.Context, in *AddMerchandiseStyleReq, opts ...client.CallOption) (*AddMerchandiseStyleResp, error) {
+	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/AddMerchandiseStyle", in)
+	out := new(AddMerchandiseStyleResp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &merchandiseServiceAddMerchandiseStyle{stream}, nil
-}
-
-type MerchandiseService_AddMerchandiseStyleService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	CloseSend() error
-	Close() error
-	Send(*AddMerchandiseStyleReq) error
-}
-
-type merchandiseServiceAddMerchandiseStyle struct {
-	stream client.Stream
-}
-
-func (x *merchandiseServiceAddMerchandiseStyle) CloseSend() error {
-	return x.stream.CloseSend()
-}
-
-func (x *merchandiseServiceAddMerchandiseStyle) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServiceAddMerchandiseStyle) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServiceAddMerchandiseStyle) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServiceAddMerchandiseStyle) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServiceAddMerchandiseStyle) Send(m *AddMerchandiseStyleReq) error {
-	return x.stream.Send(m)
+	return out, nil
 }
 
 func (c *merchandiseService) RemoveMerchandiseStyle(ctx context.Context, in *RemoveMerchandiseStyleReq, opts ...client.CallOption) (*RemoveMerchandiseStyleResp, error) {
@@ -249,50 +142,14 @@ func (c *merchandiseService) RemoveMerchandiseStyle(ctx context.Context, in *Rem
 	return out, nil
 }
 
-func (c *merchandiseService) UpdateMerchandiseStyle(ctx context.Context, opts ...client.CallOption) (MerchandiseService_UpdateMerchandiseStyleService, error) {
-	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/UpdateMerchandiseStyle", &UpdateMerchandiseStyleReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *merchandiseService) UpdateMerchandiseStyle(ctx context.Context, in *UpdateMerchandiseStyleReq, opts ...client.CallOption) (*UpdateMerchandiseStyleResp, error) {
+	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/UpdateMerchandiseStyle", in)
+	out := new(UpdateMerchandiseStyleResp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &merchandiseServiceUpdateMerchandiseStyle{stream}, nil
-}
-
-type MerchandiseService_UpdateMerchandiseStyleService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	CloseSend() error
-	Close() error
-	Send(*UpdateMerchandiseStyleReq) error
-}
-
-type merchandiseServiceUpdateMerchandiseStyle struct {
-	stream client.Stream
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyle) CloseSend() error {
-	return x.stream.CloseSend()
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyle) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyle) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyle) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyle) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyle) Send(m *UpdateMerchandiseStyleReq) error {
-	return x.stream.Send(m)
+	return out, nil
 }
 
 func (c *merchandiseService) GetMerchandiseStyleList(ctx context.Context, in *GetMerchandiseStyleListReq, opts ...client.CallOption) (*GetMerchandiseStyleListResp, error) {
@@ -315,35 +172,83 @@ func (c *merchandiseService) GetMerchandiseStyleDetails(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *merchandiseService) HandlePicture(ctx context.Context, opts ...client.CallOption) (MerchandiseService_HandlePictureService, error) {
+	req := c.c.NewRequest(c.name, "/merchandise_master.MerchandiseService/HandlePicture", &HandlePicturesReq{})
+	stream, err := c.c.Stream(ctx, req, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &merchandiseServiceHandlePicture{stream}, nil
+}
+
+type MerchandiseService_HandlePictureService interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	CloseSend() error
+	Close() error
+	Send(*HandlePicturesReq) error
+}
+
+type merchandiseServiceHandlePicture struct {
+	stream client.Stream
+}
+
+func (x *merchandiseServiceHandlePicture) CloseSend() error {
+	return x.stream.CloseSend()
+}
+
+func (x *merchandiseServiceHandlePicture) Close() error {
+	return x.stream.Close()
+}
+
+func (x *merchandiseServiceHandlePicture) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *merchandiseServiceHandlePicture) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *merchandiseServiceHandlePicture) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *merchandiseServiceHandlePicture) Send(m *HandlePicturesReq) error {
+	return x.stream.Send(m)
+}
+
 // Server API for MerchandiseService service
 
 type MerchandiseServiceHandler interface {
-	PutAwayMerchandise(context.Context, MerchandiseService_PutAwayMerchandiseStream) error
+	PutAwayMerchandise(context.Context, *PutAwayMerchandiseReq, *PutAwayMerchandiseResp) error
 	RemoveMerchandise(context.Context, *RemoveMerchandiseReq, *RemoveMerchandiseResp) error
-	UpdateMerchandise(context.Context, MerchandiseService_UpdateMerchandiseStream) error
+	UpdateMerchandise(context.Context, *UpdateMerchandiseReq, *UpdateMerchandiseResp) error
 	GetMerchandiseDetails(context.Context, *GetMerchandiseDetailsReq, *GetMerchandiseDetailsResp) error
 	Search(context.Context, *SearchReq, *SearchResp) error
 	SearchByCategory(context.Context, *SearchByCategoryReq, *SearchByCategoryResp) error
-	AddMerchandiseStyle(context.Context, MerchandiseService_AddMerchandiseStyleStream) error
+	AddMerchandiseStyle(context.Context, *AddMerchandiseStyleReq, *AddMerchandiseStyleResp) error
 	RemoveMerchandiseStyle(context.Context, *RemoveMerchandiseStyleReq, *RemoveMerchandiseStyleResp) error
-	UpdateMerchandiseStyle(context.Context, MerchandiseService_UpdateMerchandiseStyleStream) error
+	UpdateMerchandiseStyle(context.Context, *UpdateMerchandiseStyleReq, *UpdateMerchandiseStyleResp) error
 	GetMerchandiseStyleList(context.Context, *GetMerchandiseStyleListReq, *GetMerchandiseStyleListResp) error
 	GetMerchandiseStyleDetails(context.Context, *GetMerchandiseStyleDetailsReq, *GetMerchandiseStyleDetailsResp) error
+	HandlePicture(context.Context, MerchandiseService_HandlePictureStream) error
 }
 
 func RegisterMerchandiseServiceHandler(s server.Server, hdlr MerchandiseServiceHandler, opts ...server.HandlerOption) error {
 	type merchandiseService interface {
-		PutAwayMerchandise(ctx context.Context, stream server.Stream) error
+		PutAwayMerchandise(ctx context.Context, in *PutAwayMerchandiseReq, out *PutAwayMerchandiseResp) error
 		RemoveMerchandise(ctx context.Context, in *RemoveMerchandiseReq, out *RemoveMerchandiseResp) error
-		UpdateMerchandise(ctx context.Context, stream server.Stream) error
+		UpdateMerchandise(ctx context.Context, in *UpdateMerchandiseReq, out *UpdateMerchandiseResp) error
 		GetMerchandiseDetails(ctx context.Context, in *GetMerchandiseDetailsReq, out *GetMerchandiseDetailsResp) error
 		Search(ctx context.Context, in *SearchReq, out *SearchResp) error
 		SearchByCategory(ctx context.Context, in *SearchByCategoryReq, out *SearchByCategoryResp) error
-		AddMerchandiseStyle(ctx context.Context, stream server.Stream) error
+		AddMerchandiseStyle(ctx context.Context, in *AddMerchandiseStyleReq, out *AddMerchandiseStyleResp) error
 		RemoveMerchandiseStyle(ctx context.Context, in *RemoveMerchandiseStyleReq, out *RemoveMerchandiseStyleResp) error
-		UpdateMerchandiseStyle(ctx context.Context, stream server.Stream) error
+		UpdateMerchandiseStyle(ctx context.Context, in *UpdateMerchandiseStyleReq, out *UpdateMerchandiseStyleResp) error
 		GetMerchandiseStyleList(ctx context.Context, in *GetMerchandiseStyleListReq, out *GetMerchandiseStyleListResp) error
 		GetMerchandiseStyleDetails(ctx context.Context, in *GetMerchandiseStyleDetailsReq, out *GetMerchandiseStyleDetailsResp) error
+		HandlePicture(ctx context.Context, stream server.Stream) error
 	}
 	type MerchandiseService struct {
 		merchandiseService
@@ -356,88 +261,16 @@ type merchandiseServiceHandler struct {
 	MerchandiseServiceHandler
 }
 
-func (h *merchandiseServiceHandler) PutAwayMerchandise(ctx context.Context, stream server.Stream) error {
-	return h.MerchandiseServiceHandler.PutAwayMerchandise(ctx, &merchandiseServicePutAwayMerchandiseStream{stream})
-}
-
-type MerchandiseService_PutAwayMerchandiseStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*PutAwayMerchandiseReq, error)
-}
-
-type merchandiseServicePutAwayMerchandiseStream struct {
-	stream server.Stream
-}
-
-func (x *merchandiseServicePutAwayMerchandiseStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServicePutAwayMerchandiseStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServicePutAwayMerchandiseStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServicePutAwayMerchandiseStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServicePutAwayMerchandiseStream) Recv() (*PutAwayMerchandiseReq, error) {
-	m := new(PutAwayMerchandiseReq)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+func (h *merchandiseServiceHandler) PutAwayMerchandise(ctx context.Context, in *PutAwayMerchandiseReq, out *PutAwayMerchandiseResp) error {
+	return h.MerchandiseServiceHandler.PutAwayMerchandise(ctx, in, out)
 }
 
 func (h *merchandiseServiceHandler) RemoveMerchandise(ctx context.Context, in *RemoveMerchandiseReq, out *RemoveMerchandiseResp) error {
 	return h.MerchandiseServiceHandler.RemoveMerchandise(ctx, in, out)
 }
 
-func (h *merchandiseServiceHandler) UpdateMerchandise(ctx context.Context, stream server.Stream) error {
-	return h.MerchandiseServiceHandler.UpdateMerchandise(ctx, &merchandiseServiceUpdateMerchandiseStream{stream})
-}
-
-type MerchandiseService_UpdateMerchandiseStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*UpdateMerchandiseReq, error)
-}
-
-type merchandiseServiceUpdateMerchandiseStream struct {
-	stream server.Stream
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStream) Recv() (*UpdateMerchandiseReq, error) {
-	m := new(UpdateMerchandiseReq)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+func (h *merchandiseServiceHandler) UpdateMerchandise(ctx context.Context, in *UpdateMerchandiseReq, out *UpdateMerchandiseResp) error {
+	return h.MerchandiseServiceHandler.UpdateMerchandise(ctx, in, out)
 }
 
 func (h *merchandiseServiceHandler) GetMerchandiseDetails(ctx context.Context, in *GetMerchandiseDetailsReq, out *GetMerchandiseDetailsResp) error {
@@ -452,88 +285,16 @@ func (h *merchandiseServiceHandler) SearchByCategory(ctx context.Context, in *Se
 	return h.MerchandiseServiceHandler.SearchByCategory(ctx, in, out)
 }
 
-func (h *merchandiseServiceHandler) AddMerchandiseStyle(ctx context.Context, stream server.Stream) error {
-	return h.MerchandiseServiceHandler.AddMerchandiseStyle(ctx, &merchandiseServiceAddMerchandiseStyleStream{stream})
-}
-
-type MerchandiseService_AddMerchandiseStyleStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*AddMerchandiseStyleReq, error)
-}
-
-type merchandiseServiceAddMerchandiseStyleStream struct {
-	stream server.Stream
-}
-
-func (x *merchandiseServiceAddMerchandiseStyleStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServiceAddMerchandiseStyleStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServiceAddMerchandiseStyleStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServiceAddMerchandiseStyleStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServiceAddMerchandiseStyleStream) Recv() (*AddMerchandiseStyleReq, error) {
-	m := new(AddMerchandiseStyleReq)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+func (h *merchandiseServiceHandler) AddMerchandiseStyle(ctx context.Context, in *AddMerchandiseStyleReq, out *AddMerchandiseStyleResp) error {
+	return h.MerchandiseServiceHandler.AddMerchandiseStyle(ctx, in, out)
 }
 
 func (h *merchandiseServiceHandler) RemoveMerchandiseStyle(ctx context.Context, in *RemoveMerchandiseStyleReq, out *RemoveMerchandiseStyleResp) error {
 	return h.MerchandiseServiceHandler.RemoveMerchandiseStyle(ctx, in, out)
 }
 
-func (h *merchandiseServiceHandler) UpdateMerchandiseStyle(ctx context.Context, stream server.Stream) error {
-	return h.MerchandiseServiceHandler.UpdateMerchandiseStyle(ctx, &merchandiseServiceUpdateMerchandiseStyleStream{stream})
-}
-
-type MerchandiseService_UpdateMerchandiseStyleStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*UpdateMerchandiseStyleReq, error)
-}
-
-type merchandiseServiceUpdateMerchandiseStyleStream struct {
-	stream server.Stream
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyleStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyleStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyleStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyleStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *merchandiseServiceUpdateMerchandiseStyleStream) Recv() (*UpdateMerchandiseStyleReq, error) {
-	m := new(UpdateMerchandiseStyleReq)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+func (h *merchandiseServiceHandler) UpdateMerchandiseStyle(ctx context.Context, in *UpdateMerchandiseStyleReq, out *UpdateMerchandiseStyleResp) error {
+	return h.MerchandiseServiceHandler.UpdateMerchandiseStyle(ctx, in, out)
 }
 
 func (h *merchandiseServiceHandler) GetMerchandiseStyleList(ctx context.Context, in *GetMerchandiseStyleListReq, out *GetMerchandiseStyleListResp) error {
@@ -542,4 +303,44 @@ func (h *merchandiseServiceHandler) GetMerchandiseStyleList(ctx context.Context,
 
 func (h *merchandiseServiceHandler) GetMerchandiseStyleDetails(ctx context.Context, in *GetMerchandiseStyleDetailsReq, out *GetMerchandiseStyleDetailsResp) error {
 	return h.MerchandiseServiceHandler.GetMerchandiseStyleDetails(ctx, in, out)
+}
+
+func (h *merchandiseServiceHandler) HandlePicture(ctx context.Context, stream server.Stream) error {
+	return h.MerchandiseServiceHandler.HandlePicture(ctx, &merchandiseServiceHandlePictureStream{stream})
+}
+
+type MerchandiseService_HandlePictureStream interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Recv() (*HandlePicturesReq, error)
+}
+
+type merchandiseServiceHandlePictureStream struct {
+	stream server.Stream
+}
+
+func (x *merchandiseServiceHandlePictureStream) Close() error {
+	return x.stream.Close()
+}
+
+func (x *merchandiseServiceHandlePictureStream) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *merchandiseServiceHandlePictureStream) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *merchandiseServiceHandlePictureStream) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *merchandiseServiceHandlePictureStream) Recv() (*HandlePicturesReq, error) {
+	m := new(HandlePicturesReq)
+	if err := x.stream.Recv(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }

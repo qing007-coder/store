@@ -22,13 +22,14 @@ func NewAuthMiddleware() *AuthMiddleware {
 func (a *AuthMiddleware) Auth(fn server.HandlerFunc) server.HandlerFunc {
 	return func(ctx context.Context, req server.Request, resp interface{}) error {
 		token, ok := metadata.Get(ctx, "Authorization")
+		fmt.Println("ok:", ok)
 		if !ok {
 			fmt.Println("no-ok")
-			return errors.New("need token")
+			return errors.New("need token1")
 		}
 
 		fmt.Println("token:", token)
-		authURL := "http://127.0.0.1:8081/validate_token"
+		authURL := "http://127.0.0.1:8081/api/user/validate_token"
 		client := new(http.Client)
 		request, err := http.NewRequest("GET", authURL, nil)
 		if err != nil {

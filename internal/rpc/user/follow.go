@@ -41,11 +41,11 @@ func (r *Footprint) CancelFollow(ctx context.Context, req *user.CancelFollowReq,
 
 	if err := r.DB.Where("user_id = ? AND merchant_id = ?", uid, req.GetMerchantID()).Delete(&model.Follow{}).Error; err != nil {
 		r.Logger.Error(errors.DBUpdateError.Error(), resource.USERMODULE)
-		return errors.DBUpdateError
+		return errors.DBDeleteError
 	}
 
 	resp.Code = rsp.OK
-	resp.Message = rsp.UPDATESUCCESS
+	resp.Message = rsp.DELETESUCCESS
 
 	return nil
 }
@@ -54,7 +54,7 @@ func (r *Footprint) GetFollowList(ctx context.Context, req *user.GetFollowListRe
 	uid := ctx.Value("user_id").(string)
 
 	var u []model.User
-	if err := r.DB.Joins("JOIN user ON user.id = follow.merchant_id ").Where("follow.user_id = ?", uid).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&u).Error; err != nil {
+	if err := r.DB.Unscoped().Table("users").Joins("JOIN follows ON users.id = follows.merchant_id ").Where("follows.user_id = ? AND follows.deleted_at IS NULL", uid).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&u).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}
@@ -66,7 +66,7 @@ func (r *Footprint) GetFollowList(ctx context.Context, req *user.GetFollowListRe
 	}
 
 	var count int64
-	r.DB.Where("user_id = ?", uid).Count(&count)
+	r.DB.Table("follows").Where("user_id = ? AND deleted_at IS NULL", uid).Count(&count)
 
 	resp.Code = rsp.OK
 	resp.Message = rsp.SEARCHSUCCESS

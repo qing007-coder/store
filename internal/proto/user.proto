@@ -6,6 +6,7 @@ option go_package = "./internal/proto/user";
 // protoc --go_out=. --micro_out=. --micro_opt=use_grpc=1 .\internal\proto\user.proto
 
 service UserService {
+  rpc GetUserInfo (GetUserInfoReq) returns (GetUserInfoResp);
   rpc UpdatePersonalInfo (UpdatePersonalInfoReq) returns (UpdatePersonalInfoResp);
   rpc ModifyPassword (ModifyPasswordReq) returns (ModifyPasswordResp);
   rpc AddReceiverAddress (AddReceiverAddressReq) returns (AddReceiverAddressResp);
@@ -21,6 +22,16 @@ service UserService {
   rpc FollowMerchant (FollowMerchantReq) returns (FollowMerchantResp);
   rpc CancelFollow (CancelFollowReq) returns (CancelFollowResp);
   rpc GetFollowList (GetFollowListReq) returns (GetFollowListResp);
+}
+
+message GetUserInfoReq {
+  string userID = 1;
+}
+
+message GetUserInfoResp {
+  string code = 1;
+  string message = 2;
+  bytes data = 3;
 }
 
 // 更改用户信息

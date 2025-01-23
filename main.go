@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
+	"context"
+	"store/pkg/elasticsearch"
 	"store/pkg/errors"
+	es_ "store/script/elasticsearch"
 )
 
 func main() {
@@ -73,7 +74,7 @@ func main() {
 	//	errors.HandleError(err)
 	//	return
 	//}
-
+	//
 	//if err := srv.Run(); err != nil {
 	//	errors.HandleError(err)
 	//	return
@@ -84,16 +85,56 @@ func main() {
 	//	return
 	//}
 
-	r := gin.Default()
-	r.POST("", func(ctx *gin.Context) {
-		form, err := ctx.MultipartForm()
-		if err != nil {
-			errors.HandleError(err)
-			return
-		}
+	//r := gin.Default()
+	//r.POST("", func(ctx *gin.Context) {
+	//	form, err := ctx.MultipartForm()
+	//	if err != nil {
+	//		errors.HandleError(err)
+	//		return
+	//	}
+	//	val, ok := form.File["f"]
+	//	if !ok {
+	//		fmt.Println("ok:", ok)
+	//		return
+	//	}
+	//	fmt.Println(val)
 
-		fmt.Println(form.File["f"])
-	})
+	//file, err := form.File["f"][0].Open()
+	//if err != nil {
+	//	fmt.Println("err:", err)
+	//	return
+	//}
+	//data, err := io.ReadAll(file)
+	//if err != nil {
+	//	fmt.Println("err:", err)
+	//	return
+	//}
+	//fmt.Println(len(data))
 
-	r.Run(":8080")
+	//file, err := ctx.FormFile("ff")
+	//if err != nil {
+	//	fmt.Println("err: ", err)
+	//	return
+	//}
+	//
+	//file.Open()
+	//})
+
+	//r.Run(":8080")
+
+	m := make(map[string]*elasticsearch.Elasticsearch)
+
+	client, err := elasticsearch.NewClient(context.Background(), "http://10.3.0.42:9200", "merchandise")
+	if err != nil {
+		errors.HandleError(err)
+		return
+	}
+
+	m["merchandise"] = client
+
+	if err := es_.CreateIndex(m); err != nil {
+		errors.HandleError(err)
+		return
+	}
+
 }

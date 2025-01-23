@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package order_master;
+option go_package = "./internal/proto/order";
+
+message GenerateOrderReq {
+
+}
+
+message GenerateOrderResp {
+
+}
+
+message GetOrderDetailsReq {
+
+}
+
+message GetOrderDetailsResp {
+
+}
+
+message DeleteOrderDetailReq {
+
+}
+
+message DeleteOrderDetailsResp {
+
+}

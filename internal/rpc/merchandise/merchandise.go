@@ -1,13 +1,9 @@
 package merchandise
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
-	"github.com/minio/minio-go/v7"
-	"io"
 	"store/internal/proto/merchandise"
 	"store/internal/rpc/base"
 	"store/pkg/constant/resource"
@@ -23,69 +19,32 @@ import (
 type Merchandise struct {
 	*base.Base
 	*MerchandiseStyle
+	*Picture
 }
 
 func NewMerchandise(b *base.Base) *Merchandise {
 	return &Merchandise{
 		b,
 		NewMerchandiseStyle(b),
+		NewPicture(b),
 	}
 }
 
-func (m *Merchandise) PutAwayMerchandise(ctx context.Context, stream merchandise.MerchandiseService_PutAwayMerchandiseStream) error {
+func (m *Merchandise) PutAwayMerchandise(ctx context.Context, req *merchandise.PutAwayMerchandiseReq, resp *merchandise.PutAwayMerchandiseResp) error {
 	uid := ctx.Value("user_id").(string)
-	var req *merchandise.PutAwayMerchandiseReq
-	pictures := make(map[string]*bytes.Buffer)
-
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		req = &merchandise.PutAwayMerchandiseReq{
-			Name:     data.GetName(),
-			Info:     data.GetInfo(),
-			Delivery: data.GetDelivery(),
-			Category: data.GetCategory(),
-		}
-
-		chunk := data.GetChunk()
-		_, err = pictures[chunk.GetPictureID()].Write(chunk.GetData())
-		if err != nil {
-			return err
-		}
-	}
-
-	id := tools.CreateID()
-	var pictureList []string
-
-	for pictureID, data := range pictures {
-		path := fmt.Sprintf("%s/%s", id, pictureID)
-		pictureList = append(pictureList, path)
-
-		_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
-		if err != nil {
-			return err
-		}
-	}
 
 	if err := m.ES[store.MERCHANDISE].CreateDocument(&model.Merchandise{
-		ID:          id,
+		ID:          req.GetId(),
 		Name:        req.GetName(),
 		Info:        req.GetInfo(),
-		PictureList: pictureList,
+		PictureList: req.GetPictureList(),
 		MerchantID:  uid,
 		Delivery:    req.GetDelivery(),
 		Category:    req.GetCategory(),
 		CreateAt:    time.Now().Unix(),
 		Views:       0,
 		SalesVolume: 0,
-	}, id); err != nil {
+	}, req.GetId()); err != nil {
 		m.Logger.Error(errors.EsCreateError.Error(), resource.MERCHANDISEMODULE)
 		return err
 	}
@@ -98,10 +57,10 @@ func (m *Merchandise) PutAwayMerchandise(ctx context.Context, stream merchandise
 		Source: store.MERCHANDISE,
 	})
 
-	return stream.SendMsg(&merchandise.PutAwayMerchandiseResp{
-		Code:    rsp.OK,
-		Message: rsp.CREATESUCCESS,
-	})
+	resp.Code = rsp.OK
+	resp.Message = rsp.CREATESUCCESS
+
+	return nil
 }
 
 func (m *Merchandise) RemoveMerchandise(ctx context.Context, req *merchandise.RemoveMerchandiseReq, resp *merchandise.RemoveMerchandiseResp) error {
@@ -125,53 +84,10 @@ func (m *Merchandise) RemoveMerchandise(ctx context.Context, req *merchandise.Re
 	return nil
 }
 
-func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.MerchandiseService_UpdateMerchandiseStream) error {
+func (m *Merchandise) UpdateMerchandise(ctx context.Context, req *merchandise.UpdateMerchandiseReq, resp *merchandise.UpdateMerchandiseResp) error {
 	uid := ctx.Value("user_id").(string)
 
-	var req *merchandise.UpdateMerchandiseReq
-	pictures := make(map[string]*bytes.Buffer)
-
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		req = &merchandise.UpdateMerchandiseReq{
-			Id:       data.GetId(),
-			Name:     data.GetName(),
-			Info:     data.GetInfo(),
-			Delivery: data.GetDelivery(),
-			Category: data.GetCategory(),
-		}
-
-		chunk := data.GetChunk()
-		_, err = pictures[chunk.GetPictureID()].Write(chunk.GetData())
-		if err != nil {
-			return err
-		}
-	}
-
-	id := tools.CreateID()
-	var pictureList []string
-	for pictureID, data := range pictures {
-		path := fmt.Sprintf("%s/%s", id, pictureID)
-		pictureList = append(pictureList, path)
-
-		if data.Len() == 0 {
-			continue
-		}
-		_, err := m.MC.PutObject(m.Ctx, store.MERCHANDISE, path, data, int64(data.Len()), minio.PutObjectOptions{})
-		if err != nil {
-			return err
-		}
-	}
-
-	var queries map[string]interface{}
+	queries := make(map[string]interface{})
 
 	if req.GetName() != "" {
 		queries["name"] = req.GetName()
@@ -189,7 +105,7 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.
 		queries["delivery"] = req.GetDelivery()
 	}
 
-	queries["picture_list"] = pictureList
+	queries["picture_list"] = req.GetPictureList()
 	queries["updated_at"] = time.Now().Unix()
 
 	if err := m.ES[store.MERCHANDISE].Update(req.Id, queries); err != nil {
@@ -205,10 +121,10 @@ func (m *Merchandise) UpdateMerchandise(ctx context.Context, stream merchandise.
 		Source: store.MERCHANDISE,
 	})
 
-	return stream.SendMsg(&merchandise.UpdateMerchandiseResp{
-		Code:    rsp.OK,
-		Message: rsp.UPDATESUCCESS,
-	})
+	resp.Code = rsp.OK
+	resp.Message = rsp.UPDATESUCCESS
+
+	return nil
 }
 
 func (m *Merchandise) GetMerchandiseDetails(ctx context.Context, req *merchandise.GetMerchandiseDetailsReq, resp *merchandise.GetMerchandiseDetailsResp) error {
@@ -226,35 +142,76 @@ func (m *Merchandise) GetMerchandiseDetails(ctx context.Context, req *merchandis
 
 func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, resp *merchandise.SearchResp) error {
 	var sort []types.SortCombinations
-	if req.GetTime() == 0 {
+
+	switch req.GetTime() {
+	case 0:
+		//sort = append(sort, map[string]interface{}{"field": "create_at", "order": "desc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "create_at",
-			"order": "desc",
+			"create_at": map[string]interface{}{
+				"order": "desc",
+			},
 		})
-	} else if req.GetSales() == 1 {
+	case 1:
+		//sort = append(sort, map[string]interface{}{"field": "create_at", "order": "asc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "create_at",
-			"order": "asc",
+			"create_at": map[string]interface{}{
+				"order": "asc",
+			},
 		})
-	} else {
+	default:
 		m.Logger.Error(errors.UndefinedValue("time").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知time值")
 	}
 
-	if req.GetSales() == 0 {
+	switch req.GetSales() {
+	case 0:
+		//sort = append(sort, map[string]interface{}{"field": "sales_volume", "order": "desc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "sales_volume",
-			"order": "desc",
+			"sales_volume": map[string]interface{}{
+				"order": "desc",
+			},
 		})
-	} else if req.GetSales() == 1 {
+	case 1:
+		//sort = append(sort, map[string]interface{}{"field": "sales_volume", "order": "asc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "sales_volume",
-			"order": "asc",
+			"sales_volume": map[string]interface{}{
+				"order": "asc",
+			},
 		})
-	} else {
+	default:
 		m.Logger.Error(errors.UndefinedValue("sales").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知sales值")
 	}
+
+	//if req.GetTime() == 0 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "create_at",
+	//		"order": "desc",
+	//	})
+	//} else if req.GetSales() == 1 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "create_at",
+	//		"order": "asc",
+	//	})
+	//} else {
+	//	m.Logger.Error(errors.UndefinedValue("time").Error(), resource.MERCHANDISEMODULE)
+	//	return errors.New("未知time值")
+	//}
+	//
+	//if req.GetSales() == 0 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "sales_volume",
+	//		"order": "desc",
+	//	})
+	//} else if req.GetSales() == 1 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "sales_volume",
+	//		"order": "asc",
+	//	})
+	//} else {
+	//	m.Logger.Error(errors.UndefinedValue("sales").Error(), resource.MERCHANDISEMODULE)
+	//	return errors.New("未知sales值")
+	//}
 
 	shouldQueries := []types.Query{
 		{
@@ -314,35 +271,76 @@ func (m *Merchandise) Search(ctx context.Context, req *merchandise.SearchReq, re
 
 func (m *Merchandise) SearchByCategory(ctx context.Context, req *merchandise.SearchByCategoryReq, resp *merchandise.SearchByCategoryResp) error {
 	var sort []types.SortCombinations
-	if req.GetTime() == 0 {
+
+	switch req.GetTime() {
+	case 0:
+		//sort = append(sort, map[string]interface{}{"field": "create_at", "order": "desc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "create_at",
-			"order": "desc",
+			"create_at": map[string]interface{}{
+				"order": "desc",
+			},
 		})
-	} else if req.GetSales() == 1 {
+	case 1:
+		//sort = append(sort, map[string]interface{}{"field": "create_at", "order": "asc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "create_at",
-			"order": "asc",
+			"create_at": map[string]interface{}{
+				"order": "asc",
+			},
 		})
-	} else {
+	default:
 		m.Logger.Error(errors.UndefinedValue("time").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知time值")
 	}
 
-	if req.GetSales() == 0 {
+	switch req.GetSales() {
+	case 0:
+		//sort = append(sort, map[string]interface{}{"field": "sales_volume", "order": "desc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "sales_volume",
-			"order": "desc",
+			"sales_volume": map[string]interface{}{
+				"order": "desc",
+			},
 		})
-	} else if req.GetSales() == 1 {
+	case 1:
+		//sort = append(sort, map[string]interface{}{"field": "sales_volume", "order": "asc"})
 		sort = append(sort, map[string]interface{}{
-			"field": "sales_volume",
-			"order": "asc",
+			"sales_volume": map[string]interface{}{
+				"order": "asc",
+			},
 		})
-	} else {
+	default:
 		m.Logger.Error(errors.UndefinedValue("sales").Error(), resource.MERCHANDISEMODULE)
 		return errors.New("未知sales值")
 	}
+
+	//if req.GetTime() == 0 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "create_at",
+	//		"order": "desc",
+	//	})
+	//} else if req.GetSales() == 1 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "create_at",
+	//		"order": "asc",
+	//	})
+	//} else {
+	//	m.Logger.Error(errors.UndefinedValue("time").Error(), resource.MERCHANDISEMODULE)
+	//	return errors.New("未知time值")
+	//}
+	//
+	//if req.GetSales() == 0 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "sales_volume",
+	//		"order": "desc",
+	//	})
+	//} else if req.GetSales() == 1 {
+	//	sort = append(sort, map[string]interface{}{
+	//		"field": "sales_volume",
+	//		"order": "asc",
+	//	})
+	//} else {
+	//	m.Logger.Error(errors.UndefinedValue("sales").Error(), resource.MERCHANDISEMODULE)
+	//	return errors.New("未知sales值")
+	//}
 
 	queries := []types.Query{
 		{

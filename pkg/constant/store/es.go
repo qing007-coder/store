@@ -1,5 +1,5 @@
 package store
 
 const MERCHANDISE = "merchandise"
-const MERCHANDISESTYLE = "merchandise_style"
+const MERCHANDISESTYLE = "merchandise-style"
 const MERCHANT = "merchant"

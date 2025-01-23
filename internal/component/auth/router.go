@@ -17,14 +17,18 @@ func NewRouter(auth *AuthApi) *Router {
 }
 
 func (r *Router) Run() error {
-	r.engine.GET("auth", r.auth.Auth)
-	r.engine.GET("token", r.auth.ExchangeToken)
-	r.engine.POST("register_client", r.auth.RegisterClient)
-	r.engine.GET("validate_token", r.auth.ValidateToken)
-	r.engine.POST("register", r.auth.Register)
-	r.engine.POST("login_by_password", r.auth.LoginByPassword)
-	r.engine.POST("login_by_verification_code", r.auth.LoginByVerificationCode)
-	r.engine.POST("send_email", r.auth.SendEmail)
+
+	auth := r.engine.Group("/api/user")
+	{
+		auth.GET("auth", r.auth.Auth)
+		auth.GET("token", r.auth.ExchangeToken)
+		auth.POST("register_client", r.auth.RegisterClient)
+		auth.GET("validate_token", r.auth.ValidateToken)
+		auth.POST("register", r.auth.Register)
+		auth.POST("login_by_password", r.auth.LoginByPassword)
+		auth.POST("login_by_verification_code", r.auth.LoginByVerificationCode)
+		auth.POST("send_email", r.auth.SendEmail)
+	}
 
 	return r.engine.Run(":8081")
 }

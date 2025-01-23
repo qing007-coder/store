@@ -40,9 +40,9 @@ func (r *Footprint) AddFootprint(ctx context.Context, req *user.AddFootprintReq,
 func (r *Footprint) DeleteFootprint(ctx context.Context, req *user.DeleteFootprintReq, resp *user.DeleteFootprintResp) error {
 	uid := ctx.Value("user_id").(string)
 
-	if err := r.DB.Where("user_id = ? AND target_id", uid, req.GetTargetID()).Delete(&model.Footprint{}).Error; err != nil {
+	if err := r.DB.Where("user_id = ? AND target_id = ?", uid, req.GetTargetID()).Delete(&model.Footprint{}).Error; err != nil {
 		r.Logger.Error(errors.DBDeleteError.Error(), resource.USERMODULE)
-		return errors.EsDeleteError
+		return errors.DBDeleteError
 	}
 
 	resp.Code = rsp.OK
@@ -99,7 +99,7 @@ func (r *Footprint) GetFootprintList(ctx context.Context, req *user.GetFootprint
 
 	var count int64
 	var footprintList []model.Footprint
-	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Count(&count).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&footprintList).Error; err != nil {
+	if err := r.DB.Where("user_id = ? AND category = ?", uid, req.GetCategory()).Limit(int(req.GetSize())).Offset(int((req.GetReq() - 1) * req.GetSize())).Find(&footprintList).Count(&count).Error; err != nil {
 		r.Logger.Error(errors.DBQueryError.Error(), resource.USERMODULE)
 		return errors.DBQueryError
 	}

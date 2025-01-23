@@ -33,6 +33,10 @@ func NewClient(conf *config.GlobalConfig) (*gorm.DB, error) {
 		&model.Client{},
 		&model.MerchantRecord{},
 		&model.Order{},
+		&model.Follow{},
+		&model.Favourites{},
+		&model.ReceiverAddress{},
+		&model.Footprint{},
 	); err != nil {
 		return nil, errors.AutoMigrateFailed
 	}

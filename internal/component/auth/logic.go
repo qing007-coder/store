@@ -257,6 +257,13 @@ func (a *AuthApi) Register(ctx *gin.Context) {
 		return
 	}
 
+	var count int64
+	a.db.Model(&model.User{}).Where("email = ?", req.Email).Count(&count)
+	if count > 0 {
+		tools.BadRequest(ctx, "邮箱已注册")
+		return
+	}
+
 	data, err := a.rdb.Get(a.ctx, req.Email)
 	if err != nil {
 		tools.BadRequest(ctx, err.Error())
@@ -309,16 +316,9 @@ func (a *AuthApi) SendEmail(ctx *gin.Context) {
 		return
 	}
 
-	data, err := a.rdb.Get(a.ctx, req.Email)
+	data, err := a.rdb.Get(a.ctx, req.Email+".send")
 	if err == nil && data != "" {
 		tools.BadRequest(ctx, "发送验证码过于频繁")
-		return
-	}
-
-	var count int64
-	a.db.Model(&model.User{}).Where("email = ?", req.Email).Count(&count)
-	if count > 0 {
-		tools.BadRequest(ctx, "邮箱已注册")
 		return
 	}
 
